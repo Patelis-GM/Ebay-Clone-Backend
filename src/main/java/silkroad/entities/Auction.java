@@ -44,8 +44,8 @@ public class Auction {
     @Column(name = "first_bid", nullable = false)
     private Double firstBid;
 
-    @Column(name = "version", nullable = false)
-    private Long version;
+    @Column(name = "total_bids", nullable = false)
+    private Long totalBids;
 
     @Column(name = "highest_bid", nullable = false)
     private Double highestBid;
@@ -98,7 +98,7 @@ public class Auction {
         this.seller = seller;
         this.highestBid = firstBid;
         this.bidder = null;
-        this.version = 0L;
+        this.totalBids = 0L;
     }
 
     @Override

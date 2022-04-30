@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import silkroad.dtos.auction.request.AuctionStoreDTO;
+import silkroad.dtos.auction.request.AuctionPosting;
 import silkroad.entities.Address;
 import silkroad.entities.Auction;
 import silkroad.services.AddressService;
@@ -24,7 +24,7 @@ public class AuctionController {
 
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<Void> createAuction(Authentication authentication, @RequestPart(name = "auction") AuctionStoreDTO auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
+    public ResponseEntity<Void> createAuction(Authentication authentication, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
         this.auctionService.createAuction(authentication.getName(), auctionDTO, multipartFiles);
@@ -32,7 +32,7 @@ public class AuctionController {
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public ResponseEntity<Void> updateAuction(Authentication authentication, @RequestParam(name = "id") Long auctionID, @RequestPart(name = "auction") AuctionStoreDTO auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
+    public ResponseEntity<Void> updateAuction(Authentication authentication, @RequestParam(name = "id") Long auctionID, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
         this.auctionService.updateAuction(authentication.getName(), auctionID, auctionDTO, multipartFiles);
@@ -46,7 +46,7 @@ public class AuctionController {
     }
 
     @RequestMapping(value = "/create1", method = RequestMethod.POST)
-    public ResponseEntity<Void> createAuction1(Authentication authentication, @RequestBody AuctionStoreDTO auctionDTO) {
+    public ResponseEntity<Void> createAuction1(Authentication authentication, @RequestBody AuctionPosting auctionDTO) {
         MultipartFile[] multipartFiles = new MultipartFile[5];
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
@@ -55,7 +55,7 @@ public class AuctionController {
     }
 
     @RequestMapping(value = "/update1", method = RequestMethod.POST)
-    public ResponseEntity<Void> updateAuction1(@RequestParam Long auctionID, Authentication authentication, @RequestBody AuctionStoreDTO auctionDTO) {
+    public ResponseEntity<Void> updateAuction1(@RequestParam Long auctionID, Authentication authentication, @RequestBody AuctionPosting auctionDTO) {
         MultipartFile[] multipartFiles = new MultipartFile[5];
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
@@ -68,8 +68,6 @@ public class AuctionController {
         this.auctionService.deleteAuction("user1", auctionID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-
 
 
 //    @RequestMapping(value = "/search", method = RequestMethod.POST)

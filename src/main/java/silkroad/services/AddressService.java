@@ -20,7 +20,7 @@ public class AddressService {
             Address newAddress = this.persistenceService.persist(address);
             return newAddress;
         } catch (PersistenceException e) {
-            return this.addressRepository.getById(address.getAddressID());
+            return this.addressRepository.getById(address.getCoordinates());
         }
     }
 

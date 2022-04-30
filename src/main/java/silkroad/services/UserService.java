@@ -1,6 +1,9 @@
 package silkroad.services;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,17 +13,27 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import silkroad.dtos.user.UserSecurityDTO;
-import silkroad.dtos.user.request.UserSignUpDTO;
+import silkroad.dtos.page.PageResponse;
+import silkroad.dtos.user.UserMapper;
+import silkroad.dtos.user.request.UserSecurityDetails;
+import silkroad.dtos.user.request.UserRegistration;
+import silkroad.dtos.user.response.UserBasicDetails;
+import silkroad.dtos.user.response.UserCompleteDetails;
 import silkroad.entities.Role;
 import silkroad.entities.Roles;
 import silkroad.entities.User;
 import silkroad.exceptions.LoginException;
 import silkroad.exceptions.SignUpException;
+import silkroad.exceptions.UserException;
 import silkroad.repositories.UserRepository;
 import silkroad.security.UserInformation;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -30,12 +43,13 @@ public class UserService implements UserDetailsService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Optional<UserSecurityDTO> user = this.userRepository.findByUsername(username);
+        Optional<UserSecurityDetails> user = this.userRepository.findByUsername(username);
 
         if (user.isEmpty())
             throw new LoginException(username, LoginException.LOGIN_USER_NOT_FOUND);
@@ -51,9 +65,8 @@ public class UserService implements UserDetailsService {
         return new UserInformation(user.get().getUsername(), user.get().getPassword(), user.get().getApproved(), grantedAuthorities);
     }
 
-
     @Transactional
-    public void signUpUser(UserSignUpDTO user) {
+    public void signUpUser(UserRegistration user) {
 
         if (this.userRepository.existsByUsername(user.getUsername()))
             throw new SignUpException(user.getUsername(), SignUpException.SIGNUP_USERNAME_EXISTS, HttpStatus.BAD_REQUEST);
@@ -75,4 +88,30 @@ public class UserService implements UserDetailsService {
         this.userRepository.save(newUser);
     }
 
+    public void approveUser(String username) {
+        if (this.userRepository.updateApprovalStatusByUsername(username, true) == 0)
+            throw new UserException(username, UserException.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+
+    public UserCompleteDetails getUser(String username) {
+
+        Optional<User> optionalUser = this.userRepository.findWithAddressByUsername(username);
+
+        if (optionalUser.isPresent())
+            return this.userMapper.mapToUserCompleteDetails(optionalUser.get());
+
+        else
+            throw new UserException(username, UserException.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+
+    public PageResponse<UserBasicDetails> getUsersBasicDetails(Boolean approvalStatus, Integer pageIndex, Integer pageSize) {
+        Specification<User> userSpecification = null;
+
+        if (approvalStatus != null)
+            userSpecification = (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("approved"), approvalStatus);
+
+        PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
+        Page<User> userPage = this.userRepository.findAll(userSpecification, pageRequest);
+        return new PageResponse<>(this.userMapper.mapToUsersBasicDetails(userPage.getContent()), userPage.getNumber() + 1, userPage.getTotalPages(), (int) userPage.getTotalElements(), userPage.getNumberOfElements());
+    }
 }

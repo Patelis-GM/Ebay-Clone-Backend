@@ -6,10 +6,9 @@ import silkroad.entities.Address;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Data
-public class AuctionStoreDTO implements Serializable {
+public class AuctionPosting implements Serializable {
 
     private String name;
     private String description;
@@ -18,5 +17,6 @@ public class AuctionStoreDTO implements Serializable {
     private Double firstBid;
     private List<String> categories;
     private Address address;
+
 
 }

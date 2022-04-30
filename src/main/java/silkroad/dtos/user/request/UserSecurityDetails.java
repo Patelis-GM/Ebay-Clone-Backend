@@ -1,4 +1,4 @@
-package silkroad.dtos.user;
+package silkroad.dtos.user.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor
-public class UserSecurityDTO implements Serializable {
+public class UserSecurityDetails implements Serializable {
 
     private final String username;
     private final String password;

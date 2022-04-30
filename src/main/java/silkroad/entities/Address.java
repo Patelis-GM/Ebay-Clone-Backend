@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.SQLInsert;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -17,14 +16,10 @@ import javax.persistence.Table;
 @ToString
 @Getter
 @Setter
-//@SQLInsert(sql = "INSERT IGNORE \n" + "        into\n" + "            address\n" + "            (country, location, street_name, street_number, zip_code, latitude, longitude) \n" +
-//        "        values\n" +
-//        "            (?, ?, ?, ?, ?, ?, ?)")
 public class Address {
 
     @EmbeddedId
-    @JsonAlias("coordinates")
-    private AddressID addressID;
+    private AddressID coordinates;
 
     @Column(name = "country", nullable = false, length = 45)
     private String country;

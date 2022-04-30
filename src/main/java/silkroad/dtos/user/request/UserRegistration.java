@@ -6,7 +6,7 @@ import silkroad.entities.Address;
 import java.io.Serializable;
 
 @Data
-public class UserSignUpDTO implements Serializable {
+public class UserRegistration implements Serializable {
 
     private String username;
     private String password;

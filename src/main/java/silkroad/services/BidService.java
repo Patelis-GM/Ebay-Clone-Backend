@@ -56,10 +56,14 @@ public class BidService {
 
         User bidder = this.userRepository.getById(username);
 
+        Long totalBids = auction.getTotalBids();
+        if (!this.bidRepository.existsByBidderAndAuctionId(bidder, auctionID))
+            totalBids += 1;
+
         if (auction.getBuyPrice() != null && amount >= auction.getBuyPrice()) {
-            if (this.bidRepository.bid(auctionID, bidder, amount) == 0)
+            if (this.bidRepository.bid(auctionID, bidder, amount, totalBids) == 0)
                 throw new BidException(BidException.ALREADY_BOUGHT, HttpStatus.BAD_REQUEST);
-        } else if (this.bidRepository.bid(auctionID, bidder, amount) == 0)
+        } else if (this.bidRepository.bid(auctionID, bidder, amount, totalBids) == 0)
             throw new BidException(BidException.HIGHER_BID, HttpStatus.BAD_REQUEST);
 
         Optional<Bid> optionalBid = this.bidRepository.findByAuctionAndBidder(auctionID, username);

@@ -4,29 +4,35 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import silkroad.dtos.user.request.UserSignUpDTO;
+import silkroad.dtos.page.PageResponse;
+import silkroad.dtos.user.response.UserBasicDetails;
+import silkroad.dtos.user.response.UserCompleteDetails;
 import silkroad.services.UserService;
-
-import java.time.Instant;
 
 @AllArgsConstructor
 @RestController
+@RequestMapping(value = "/administration")
 public class AdministratorController {
 
     private final UserService userService;
 
-    @GetMapping(value = "/admin")
-    public String hiAdmin(@RequestParam Long haha) throws InterruptedException {
-        Instant instant = Instant.now();
-        System.out.println("Came in at :" + instant.toEpochMilli());
-        return "Ok";
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ResponseEntity<PageResponse<UserBasicDetails>> getUsers(@RequestParam(name = "approved", required = false) Boolean approvalStatus, @RequestParam(name = "page") Integer pageIndex, @RequestParam(name = "size") Integer pageSize) {
+        System.out.println(approvalStatus);
+        return new ResponseEntity<>(this.userService.getUsersBasicDetails(approvalStatus, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/approved")
-    public String hiApproved() {
-        return "Hi, approved User";
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.GET)
+    public ResponseEntity<UserCompleteDetails> getUser(@PathVariable String username) {
+        return new ResponseEntity<>(this.userService.getUser(username), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/approve", method = RequestMethod.POST)
+    public ResponseEntity<Void> approveUser(@RequestParam String username) {
+        this.userService.approveUser(username);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 
 }

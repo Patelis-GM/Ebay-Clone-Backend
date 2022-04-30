@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import silkroad.dtos.auction.request.AuctionStoreDTO;
+import silkroad.dtos.auction.request.AuctionPosting;
 import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
 import silkroad.repositories.*;
@@ -22,7 +22,7 @@ public class AuctionService {
     private final ImageService imageService;
 
     @Transactional
-    public void createAuction(String username, AuctionStoreDTO auctionDTO, MultipartFile[] multipartFiles) {
+    public void createAuction(String username, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
         Set<Category> auctionCategories = this.categoryRepository.findAll(auctionDTO.getCategories());
 
@@ -43,7 +43,7 @@ public class AuctionService {
     }
 
     @Transactional
-    public void updateAuction(String username, Long auctionID, AuctionStoreDTO auctionDTO, MultipartFile[] multipartFiles) {
+    public void updateAuction(String username, Long auctionID, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
         Set<Category> auctionCategories = this.categoryRepository.findAll(auctionDTO.getCategories());
 
@@ -68,7 +68,6 @@ public class AuctionService {
         auction.setBuyPrice(auctionDTO.getBuyPrice());
         auction.setFirstBid(auctionDTO.getFirstBid());
         auction.setCategories(auctionCategories);
-        auction.setVersion(auction.getVersion() + 1);
         this.auctionRepository.save(auction);
 
 //        this.imageService.updateImages(auction, multipartFiles);
