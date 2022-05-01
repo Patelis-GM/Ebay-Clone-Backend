@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import silkroad.dtos.auction.request.AuctionPosting;
+import silkroad.dtos.auction.response.AuctionCompleteDetails;
 import silkroad.entities.Address;
 import silkroad.entities.Auction;
 import silkroad.services.AddressService;
@@ -44,6 +45,12 @@ public class AuctionController {
         this.auctionService.deleteAuction(authentication.getName(), auctionID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/{auctionID}")
+    public ResponseEntity<AuctionCompleteDetails> getAuction(@PathVariable Long auctionID){
+        return new ResponseEntity<>(this.auctionService.getAuction(auctionID),HttpStatus.OK);
+    }
+
 
     @RequestMapping(value = "/create1", method = RequestMethod.POST)
     public ResponseEntity<Void> createAuction1(Authentication authentication, @RequestBody AuctionPosting auctionDTO) {

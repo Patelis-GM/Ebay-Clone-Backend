@@ -106,11 +106,4 @@ public class Auction {
         return getClass().hashCode();
     }
 
-    @org.springframework.data.annotation.Transient
-    public Boolean getExpired() {
-        return TimeManager.now().getTime() >= this.endDate.getTime() || (this.buyPrice != null && this.highestBid >= buyPrice && this.bidder != null);
-    }
-
-
-
 }

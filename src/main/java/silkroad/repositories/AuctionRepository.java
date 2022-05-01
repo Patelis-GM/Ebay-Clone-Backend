@@ -35,4 +35,6 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, JpaSpec
             "a.bidder is NULL")
     Integer removeById(Long auctionID);
 
+    @Query("SELECT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.seller WHERE a.id = ?1")
+    Optional<Auction> fetchAuctionWithCompleteDetails(Long auctionID);
 }

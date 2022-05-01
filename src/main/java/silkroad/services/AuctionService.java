@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import silkroad.dtos.auction.AuctionMapper;
 import silkroad.dtos.auction.request.AuctionPosting;
+import silkroad.dtos.auction.response.AuctionCompleteDetails;
 import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
 import silkroad.repositories.*;
@@ -20,6 +22,7 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final CategoryRepository categoryRepository;
     private final ImageService imageService;
+    private final AuctionMapper auctionMapper;
 
     @Transactional
     public void createAuction(String username, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
@@ -39,7 +42,7 @@ public class AuctionService {
 
         this.auctionRepository.save(auction);
 
-//        this.imageService.uploadImages(auction, multipartFiles);
+        this.imageService.uploadImages(auction, multipartFiles);
     }
 
     @Transactional
@@ -70,7 +73,7 @@ public class AuctionService {
         auction.setCategories(auctionCategories);
         this.auctionRepository.save(auction);
 
-//        this.imageService.updateImages(auction, multipartFiles);
+        this.imageService.updateImages(auction, multipartFiles);
     }
 
     @Transactional
@@ -86,12 +89,12 @@ public class AuctionService {
         if (!auction.getSeller().getUsername().equals(username))
             throw new AuctionException(auctionID.toString(), AuctionException.BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
-//        this.imageService.deleteImages(auctionID, true);
+        this.imageService.deleteImages(auctionID, true);
 
         if (this.auctionRepository.removeById(auctionID) == 0)
             throw new AuctionException(auctionID.toString(), AuctionException.AT_LEAST_ONE_BID, HttpStatus.BAD_REQUEST);
-//        else
-//            this.imageService.deleteImages(auctionID, false);
+        else
+            this.imageService.deleteImages(auctionID, false);
     }
 
     public List<Auction> f() {
@@ -107,4 +110,13 @@ public class AuctionService {
     }
 
 
+    public AuctionCompleteDetails getAuction(Long auctionID) {
+
+        Optional<Auction> optionalAuction = this.auctionRepository.fetchAuctionWithCompleteDetails(auctionID);
+
+        if (optionalAuction.isEmpty())
+            throw new AuctionException(auctionID.toString(), AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+
+        return this.auctionMapper.mapToAuctionCompleteDetails(optionalAuction.get());
+    }
 }
