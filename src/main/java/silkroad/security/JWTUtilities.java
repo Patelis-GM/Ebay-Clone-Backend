@@ -32,6 +32,7 @@ public class JWTUtilities {
             JWTVerifier jwtVerifier = JWT.require(algorithm).build();
             return jwtVerifier.verify(JSONWebToken);
         } catch (JWTVerificationException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -55,7 +56,7 @@ public class JWTUtilities {
         String JSONWebToken = JWT.create()
                 .withSubject(user.getUsername())
                 .withClaim(JWT_ROLE_CLAIM_KEY, user.getAuthorities().iterator().next().getAuthority())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JWT_DURATION))
+                .withExpiresAt(new Date(System.currentTimeMillis() + (JWT_DURATION * 1000)))
                 .withIssuer(JWT_ISSUER)
                 .sign(algorithm);
 

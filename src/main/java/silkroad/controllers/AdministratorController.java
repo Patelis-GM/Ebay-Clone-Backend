@@ -19,7 +19,6 @@ public class AdministratorController {
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<UserBasicDetails>> getUsers(@RequestParam(name = "approved", required = false) Boolean approvalStatus, @RequestParam(name = "page") Integer pageIndex, @RequestParam(name = "size") Integer pageSize) {
-        System.out.println(approvalStatus);
         return new ResponseEntity<>(this.userService.getUsersBasicDetails(approvalStatus, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 

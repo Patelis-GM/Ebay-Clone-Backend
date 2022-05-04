@@ -7,24 +7,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import silkroad.dtos.auction.request.AuctionPosting;
+import silkroad.dtos.auction.response.AuctionBasicDetails;
 import silkroad.dtos.auction.response.AuctionCompleteDetails;
+import silkroad.dtos.auction.response.AuctionDto;
+import silkroad.dtos.page.PageResponse;
 import silkroad.entities.Address;
-import silkroad.entities.Auction;
 import silkroad.services.AddressService;
 import silkroad.services.AuctionService;
 
-import java.util.List;
-
 @AllArgsConstructor
 @RestController
-@RequestMapping(value = "/auctions")
 public class AuctionController {
 
     private final AddressService addressService;
     private final AuctionService auctionService;
 
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/create-auction", method = RequestMethod.POST)
     public ResponseEntity<Void> createAuction(Authentication authentication, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
@@ -32,7 +31,7 @@ public class AuctionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/update-action", method = RequestMethod.POST)
     public ResponseEntity<Void> updateAuction(Authentication authentication, @RequestParam(name = "id") Long auctionID, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
@@ -40,15 +39,37 @@ public class AuctionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/delete-auction", method = RequestMethod.POST)
     public ResponseEntity<Void> deleteAuction(Authentication authentication, @RequestParam(name = "id") Long auctionID) {
         this.auctionService.deleteAuction(authentication.getName(), auctionID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{auctionID}")
-    public ResponseEntity<AuctionCompleteDetails> getAuction(@PathVariable Long auctionID){
-        return new ResponseEntity<>(this.auctionService.getAuction(auctionID),HttpStatus.OK);
+    @RequestMapping(value = "/{auctionID}", method = RequestMethod.GET)
+    public ResponseEntity<AuctionCompleteDetails> getAuction(Authentication authentication, @PathVariable Long auctionID) {
+        System.out.println(authentication);
+        return new ResponseEntity<>(this.auctionService.getAuction(authentication, auctionID), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/browse", method = RequestMethod.GET)
+    public ResponseEntity<PageResponse<AuctionBasicDetails>> browseAuctions(@RequestParam(name = "query", required = false) String textSearch,
+                                                                            @RequestParam(name = "min-price", required = false) Double minPrice,
+                                                                            @RequestParam(name = "max-price", required = false) Double maxPrice,
+                                                                            @RequestParam(name = "location", required = false) String location,
+                                                                            @RequestParam(name = "category", required = false) String category,
+                                                                            @RequestParam(name = "buy-now", required = false) Boolean hasBuyPrice,
+                                                                            @RequestParam(name = "page") Integer pageIndex,
+                                                                            @RequestParam(name = "size") Integer pageSize) {
+        return new ResponseEntity<>(this.auctionService.getAuctions(pageIndex - 1, pageSize, textSearch, minPrice, maxPrice, category, location, hasBuyPrice), HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/my-auctions", method = RequestMethod.GET)
+    public ResponseEntity<PageResponse<AuctionDto>> myAuctions(Authentication authentication,
+                                                               @RequestParam(name = "sold", required = false) Boolean sold,
+                                                               @RequestParam(name = "page") Integer pageIndex,
+                                                               @RequestParam(name = "size") Integer pageSize) {
+        return new ResponseEntity<>(this.auctionService.getUserAuctions(authentication, pageIndex - 1, pageSize, sold), HttpStatus.OK);
     }
 
 
@@ -76,32 +97,5 @@ public class AuctionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
-//    @RequestMapping(value = "/search", method = RequestMethod.POST)
-//    public ResponseEntity<Void> searchAuctions(@RequestParam(name = "query" ,required = false) String query
-//            ,@RequestParam(name = "category",required = false) String category,@RequestParam(name = "minPrice",required = false) Double minPrice,Double  ) {
-//        this.auctionService.deleteAuction(authentication.getName(), auctionID);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
-
-    @RequestMapping(value = "/q", method = RequestMethod.GET)
-    public ResponseEntity<Void> deleteAuction() {
-        List<Auction> auctions = this.auctionService.f();
-        System.out.println("IN HERE BUD");
-        System.out.println(auctions.size());
-        for (Auction auction : auctions)
-            System.out.println(auction);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-
-//
-
-
-//    @RequestMapping(value = "/{auctionID}", method = RequestMethod.GET)
-//    public ResponseEntity<Void> getAuction(Authentication authentication, Long auctionID) {
-//        return new ResponseEntity<>(this.auctionService.getAuction(authentication,auctionID),HttpStatus.OK);
-//    }
-//
 
 }

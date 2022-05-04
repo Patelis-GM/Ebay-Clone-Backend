@@ -19,7 +19,7 @@ public class Category {
 
     @Id
     @Column(name = "id", nullable = false, length = 45)
-    private String id;
+    private String name;
 
     @ManyToMany(mappedBy = "categories")
     @ToString.Exclude
@@ -30,7 +30,7 @@ public class Category {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Category category = (Category) o;
-        return id != null && Objects.equals(id, category.id);
+        return name != null && Objects.equals(name, category.name);
     }
 
     @Override

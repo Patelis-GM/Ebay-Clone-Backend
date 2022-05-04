@@ -1,9 +1,15 @@
 package silkroad.services;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import silkroad.dtos.bid.BidMapper;
+import silkroad.dtos.bid.response.BidDetails;
+import silkroad.dtos.page.PageResponse;
 import silkroad.entities.Auction;
 import silkroad.entities.Bid;
 import silkroad.entities.User;
@@ -15,6 +21,7 @@ import silkroad.repositories.UserRepository;
 import silkroad.utilities.TimeManager;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,6 +33,7 @@ public class BidService {
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
+    private final BidMapper bidMapper;
 
     @Transactional
     public void bid(String username, Long auctionID, Double amount) {
@@ -82,4 +90,19 @@ public class BidService {
 
     }
 
+    public PageResponse<BidDetails> getBids(Long auctionID, Integer page, Integer size, String sortField, String sortDirection) {
+
+        PageRequest pageRequest;
+
+        if (sortDirection.equals("asc"))
+            pageRequest = PageRequest.of(page, size, Sort.by(sortField).ascending());
+        else
+            pageRequest = PageRequest.of(page, size, Sort.by(sortField).descending());
+
+
+        Page<Bid> bidsPage = this.bidRepository.findByAuctionId(auctionID, pageRequest);
+        List<BidDetails> auctionBids = this.bidMapper.mapBidToBidsDetails(bidsPage.getContent());
+
+        return new PageResponse<>(auctionBids, bidsPage.getNumber() + 1, bidsPage.getTotalPages(), bidsPage.getTotalElements(), bidsPage.getNumberOfElements());
+    }
 }

@@ -30,8 +30,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        System.out.println("INCOMING");
-
         boolean isBearerOfJWT = JWTUtilities.isBearerOfJWT(request);
 
         if (request.getServletPath().equals("/login")) {
@@ -55,9 +53,12 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
             if (isBearerOfJWT) {
 
+
                 DecodedJWT decodedJSONWebToken = JWTUtilities.verifyJWT(request);
 
                 if (decodedJSONWebToken != null) {
+
+
 
                     List<String> load = JWTUtilities.extractLoad(decodedJSONWebToken);
 
@@ -66,6 +67,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                     grantedAuthorities.add(new SimpleGrantedAuthority(load.get(1)));
 
 //                    UserInformation userDetails = (UserInformation) this.userService.loadUserByUsername(username);
+
 
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
 

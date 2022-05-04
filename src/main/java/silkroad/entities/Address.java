@@ -21,13 +21,13 @@ public class Address {
     @EmbeddedId
     private AddressID coordinates;
 
-    @Column(name = "country", nullable = false, length = 45)
+    @Column(name = "country", nullable = false, length = 100)
     private String country;
 
-    @Column(name = "location", nullable = false, length = 45)
+    @Column(name = "location", nullable = false, length = 100)
     private String location;
 
-    @Column(name = "street_name", nullable = false, length = 45)
+    @Column(name = "street_name", nullable = false, length = 100)
     private String streetName;
 
     @Column(name = "street_number", nullable = false, length = 45)

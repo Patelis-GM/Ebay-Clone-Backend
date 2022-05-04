@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.domain.Persistable;
+import org.springframework.security.core.Authentication;
 import silkroad.utilities.TimeManager;
 
 import javax.persistence.*;
@@ -27,7 +28,7 @@ public class User {
     @Column(name = "password", nullable = false, length = 256)
     private String password;
 
-    @Column(name = "email", nullable = false, length = 45)
+    @Column(name = "email", nullable = false, length = 100)
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -90,5 +91,9 @@ public class User {
         this.buyerRating = 0.0;
         this.sellerRating = 0.0;
         this.joinDate = TimeManager.now();
+    }
+
+    public void searched(Auction auction) {
+        this.searchHistory.add(auction);
     }
 }

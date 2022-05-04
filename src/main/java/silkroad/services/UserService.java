@@ -28,12 +28,8 @@ import silkroad.exceptions.UserException;
 import silkroad.repositories.UserRepository;
 import silkroad.security.UserInformation;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,7 +40,6 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -88,6 +83,7 @@ public class UserService implements UserDetailsService {
         this.userRepository.save(newUser);
     }
 
+    @Transactional
     public void approveUser(String username) {
         if (this.userRepository.updateApprovalStatusByUsername(username, true) == 0)
             throw new UserException(username, UserException.NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -112,6 +108,6 @@ public class UserService implements UserDetailsService {
 
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         Page<User> userPage = this.userRepository.findAll(userSpecification, pageRequest);
-        return new PageResponse<>(this.userMapper.mapToUsersBasicDetails(userPage.getContent()), userPage.getNumber() + 1, userPage.getTotalPages(), (int) userPage.getTotalElements(), userPage.getNumberOfElements());
+        return new PageResponse<>(this.userMapper.mapToUsersBasicDetails(userPage.getContent()), userPage.getNumber() + 1, userPage.getTotalPages(), userPage.getTotalElements(), userPage.getNumberOfElements());
     }
 }
