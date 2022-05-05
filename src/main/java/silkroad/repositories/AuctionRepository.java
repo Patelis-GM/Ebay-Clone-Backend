@@ -22,19 +22,17 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, JpaSpec
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Auction> findNonExpiredByIdWithPessimisticLock(Long auctionID, Date now);
 
-
     @Transactional
-    @Query("SELECT a FROM Auction a WHERE a.id = ?1 and a.bidder is NULL")
+    @Query("SELECT a FROM Auction a WHERE a.id = ?1 and a.latestBid is NULL")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Auction> findByIdWithPessimisticLock(Long id);
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM Auction a WHERE " +
-            "a.id = ?1 AND " +
-            "a.bidder is NULL")
+    @Query("DELETE FROM Auction a WHERE a.id = ?1 AND a.latestBid is NULL")
     Integer removeById(Long auctionID);
 
     @Query("SELECT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.seller WHERE a.id = ?1")
     Optional<Auction> fetchAuctionWithCompleteDetails(Long auctionID);
+
 }

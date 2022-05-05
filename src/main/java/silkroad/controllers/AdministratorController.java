@@ -9,6 +9,8 @@ import silkroad.dtos.user.response.UserBasicDetails;
 import silkroad.dtos.user.response.UserCompleteDetails;
 import silkroad.services.UserService;
 
+import javax.websocket.server.PathParam;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping(value = "/administration")
@@ -27,8 +29,8 @@ public class AdministratorController {
         return new ResponseEntity<>(this.userService.getUser(username), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/approve", method = RequestMethod.POST)
-    public ResponseEntity<Void> approveUser(@RequestParam String username) {
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.PUT)
+    public ResponseEntity<Void> approveUser(@PathVariable String username) {
         this.userService.approveUser(username);
         return new ResponseEntity<>(HttpStatus.OK);
     }

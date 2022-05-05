@@ -3,7 +3,9 @@ package silkroad.services;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import silkroad.entities.Address;
+import silkroad.entities.AddressID;
 import silkroad.repositories.AddressRepository;
+import silkroad.repositories.GeneralPurposeRepository;
 
 import javax.persistence.PersistenceException;
 
@@ -13,12 +15,11 @@ import javax.persistence.PersistenceException;
 public class AddressService {
 
     private final AddressRepository addressRepository;
-    private final PersistenceService persistenceService;
+    private final GeneralPurposeRepository<Address, AddressID> generalPurposeRepository;
 
     public Address createOrFindAddress(Address address) {
         try {
-            Address newAddress = this.persistenceService.persist(address);
-            return newAddress;
+            return this.generalPurposeRepository.persist(address);
         } catch (PersistenceException e) {
             return this.addressRepository.getById(address.getCoordinates());
         }

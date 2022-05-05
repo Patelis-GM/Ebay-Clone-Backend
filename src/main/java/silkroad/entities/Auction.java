@@ -3,9 +3,6 @@ package silkroad.entities;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import silkroad.utilities.TimeManager;
 
 import javax.persistence.*;
@@ -21,7 +18,9 @@ import java.util.*;
 @Setter
 @NamedQueries({
         @NamedQuery(name = "Auction.findAllByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id in :ids"),
-        @NamedQuery(name = "Auction.findUserAuctionsByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.address address JOIN FETCH a.images images JOIN FETCH a.categories categories WHERE a.id in :ids")})
+        @NamedQuery(name = "Auction.findUserAuctionsByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.categories LEFT JOIN FETCH a.latestBid WHERE a.id in :ids"),
+        @NamedQuery(name = "Auction.findUserPurchasesByCriteria", query = "SELECT DISTINCT a FROM Auction a  JOIN FETCH a.images JOIN FETCH a.latestBid WHERE a.id in :ids")
+})
 public class Auction {
 
 
@@ -32,12 +31,11 @@ public class Auction {
         this.endDate = endDate;
         this.buyPrice = buyPrice;
         this.firstBid = firstBid;
-        this.seller = seller;
         this.highestBid = firstBid;
-        this.bidder = null;
+        this.seller = seller;
+        this.latestBid = null;
         this.totalBids = 0L;
     }
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,9 +77,9 @@ public class Auction {
     @OneToMany(mappedBy = "auction")
     List<Bid> bids = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bidder_id")
-    private User bidder;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bid_id", nullable = true)
+    private Bid latestBid;
 
     @ManyToMany
     @JoinTable(
@@ -90,8 +88,9 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     Set<Category> categories = new HashSet<>();
 
+
     @OneToMany(mappedBy = "auction")
-    private Set<Image> images = new LinkedHashSet<>();
+    private Set<Image> images = new HashSet<>();
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -101,15 +100,11 @@ public class Auction {
     })
     private Address address;
 
-    @ManyToMany(mappedBy = "searchHistory")
-    private Set<User> users;
-
 
     @Override
     public int hashCode() {
         return getClass().hashCode();
     }
-
 
     public static Predicate isActive(Root<Auction> root, CriteriaBuilder criteriaBuilder) {
 
@@ -123,9 +118,7 @@ public class Auction {
         return criteriaBuilder.and(isNotDue, criteriaBuilder.or(isBuyPriceAbsent, criteriaBuilder.and(isBuyPricePresent, isHighestBidLessThanBuyPrice)));
     }
 
-    public static Predicate isSold(Root<Auction> root, CriteriaBuilder criteriaBuilder) {
-
-        System.out.println("in here");
+    public static Predicate wasSold(Root<Auction> root, CriteriaBuilder criteriaBuilder) {
 
         Predicate isBuyPricePresent = criteriaBuilder.isNotNull(root.get("buyPrice"));
         Predicate isHighestBidHigherThanOrEqualToBuyPrice = criteriaBuilder.greaterThanOrEqualTo(root.get("highestBid"), root.get("buyPrice"));
@@ -138,7 +131,7 @@ public class Auction {
         return criteriaBuilder.or(wasSoldWithBuyPrice, wasSold);
     }
 
-    public static Predicate isExpired(Root<Auction> root, CriteriaBuilder criteriaBuilder) {
+    public static Predicate wasNotSold(Root<Auction> root, CriteriaBuilder criteriaBuilder) {
 
         Predicate isDue = criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), TimeManager.now());
         Predicate bidsAbsent = criteriaBuilder.equal(root.get("totalBids"), 0);

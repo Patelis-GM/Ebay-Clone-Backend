@@ -1,7 +1,6 @@
 package silkroad.repositories;
 
-import org.hibernate.jpa.QueryHints;
-import org.springframework.core.codec.Hints;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +36,7 @@ public class CriteriaRepositoryImpl<T, ID> implements CriteriaRepository<T, ID> 
         CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
         Root<T> rootCount = countQuery.from(entityClass);
         countQuery.select(criteriaBuilder.count(rootCount));
-        countQuery.where(specification.toPredicate(root, idQuery, entityManager.getCriteriaBuilder()));
+        countQuery.where(specification.toPredicate(rootCount, countQuery, criteriaBuilder));
         Long count = entityManager.createQuery(countQuery).getSingleResult();
 
         TypedQuery<T> typedQuery = entityManager.createNamedQuery(qlString, entityClass);

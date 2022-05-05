@@ -22,6 +22,7 @@ import silkroad.dtos.user.response.UserCompleteDetails;
 import silkroad.entities.Role;
 import silkroad.entities.Roles;
 import silkroad.entities.User;
+import silkroad.entities.User_;
 import silkroad.exceptions.LoginException;
 import silkroad.exceptions.SignUpException;
 import silkroad.exceptions.UserException;
@@ -104,7 +105,7 @@ public class UserService implements UserDetailsService {
         Specification<User> userSpecification = null;
 
         if (approvalStatus != null)
-            userSpecification = (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("approved"), approvalStatus);
+            userSpecification = (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(User_.APPROVED), approvalStatus);
 
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         Page<User> userPage = this.userRepository.findAll(userSpecification, pageRequest);

@@ -11,7 +11,9 @@ import java.util.Date;
 @Table(name = "bid")
 @Getter
 @Setter
-@ToString
+@NamedQueries({
+        @NamedQuery(name = "Bid.findUserPurchasesByCriteria", query = "SELECT b FROM Bid b JOIN FETCH b.auction bidAuction JOIN FETCH bidAuction.images WHERE b.id in :ids")
+})
 public class Bid {
 
     @Id
@@ -21,12 +23,10 @@ public class Bid {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    @ToString.Exclude
     private User bidder;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "auction_id", nullable = false)
-    @ToString.Exclude
     private Auction auction;
 
     @Column(name = "amount", nullable = false)

@@ -1,10 +1,7 @@
 package silkroad.entities;
 
-
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -13,7 +10,6 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "address")
-@ToString
 @Getter
 @Setter
 public class Address {

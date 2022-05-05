@@ -41,12 +41,15 @@ public class BidService {
         if (amount <= 0)
             throw new BidException(BidException.INVALID_AMOUNT, HttpStatus.BAD_REQUEST);
 
+        if (!this.auctionRepository.existsById(auctionID))
+            throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+
         Date bidDate = TimeManager.now();
 
         Optional<Auction> optionalAuction = this.auctionRepository.findNonExpiredByIdWithPessimisticLock(auctionID, bidDate);
 
         if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new AuctionException(auctionID.toString(), AuctionException.EXPIRED, HttpStatus.NOT_FOUND);
 
         Auction auction = optionalAuction.get();
 
@@ -55,39 +58,39 @@ public class BidService {
 
         Double auctionFirstBid = auction.getFirstBid();
         Double auctionHighestBID = auction.getHighestBid();
+        Long totalBids = auction.getTotalBids();
 
         if (amount < auction.getFirstBid())
             throw new BidException(BidException.INVALID_AMOUNT, HttpStatus.BAD_REQUEST);
 
+        if (Objects.equals(auctionFirstBid, auctionHighestBID) && totalBids > 0 && amount <= auctionHighestBID)
+            throw new BidException(BidException.HIGHER_BID, HttpStatus.BAD_REQUEST);
+
         if (!Objects.equals(auctionFirstBid, auctionHighestBID) && amount <= auctionHighestBID)
-            throw new BidException(BidException.INVALID_AMOUNT, HttpStatus.BAD_REQUEST);
+            throw new BidException(BidException.HIGHER_BID, HttpStatus.BAD_REQUEST);
 
         User bidder = this.userRepository.getById(username);
 
-        Long totalBids = auction.getTotalBids();
-        if (!this.bidRepository.existsByBidderAndAuctionId(bidder, auctionID))
-            totalBids += 1;
-
-        if (auction.getBuyPrice() != null && amount >= auction.getBuyPrice()) {
-            if (this.bidRepository.bid(auctionID, bidder, amount, totalBids) == 0)
-                throw new BidException(BidException.ALREADY_BOUGHT, HttpStatus.BAD_REQUEST);
-        } else if (this.bidRepository.bid(auctionID, bidder, amount, totalBids) == 0)
-            throw new BidException(BidException.HIGHER_BID, HttpStatus.BAD_REQUEST);
-
         Optional<Bid> optionalBid = this.bidRepository.findByAuctionAndBidder(auctionID, username);
+        Bid bid;
 
-        if (optionalBid.isPresent())
-            this.bidRepository.updateByAuctionAndBidder(amount, bidDate, auctionID, username);
-
-        else {
-            Bid bid = new Bid();
+        if (optionalBid.isPresent()) {
+            bid = optionalBid.get();
+            bid.setSubmissionDate(bidDate);
+            bid.setAmount(amount);
+        } else {
+            bid = new Bid();
             bid.setBidder(bidder);
             bid.setAmount(amount);
             bid.setAuction(auction);
             bid.setSubmissionDate(bidDate);
-            this.bidRepository.save(bid);
+            totalBids += 1;
         }
 
+        bid = this.bidRepository.save(bid);
+
+
+        this.bidRepository.bid(auctionID, bid, amount, totalBids);
     }
 
     public PageResponse<BidDetails> getBids(Long auctionID, Integer page, Integer size, String sortField, String sortDirection) {

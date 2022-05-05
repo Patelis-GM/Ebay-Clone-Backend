@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.Predicate;
 
 public interface CriteriaRepository<T, ID> {
 

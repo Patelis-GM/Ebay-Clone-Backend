@@ -2,11 +2,13 @@ package silkroad.services;
 
 import lombok.AllArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import silkroad.entities.Auction;
 import silkroad.entities.Image;
+import silkroad.exceptions.InternalServerErrorException;
 import silkroad.repositories.ImageRepository;
 
 import java.io.File;
@@ -20,7 +22,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ImageService {
 
-    private final String uploadsDirectory = "Uploads/";
+    private final String uploadsDirectory = "C:\\Users\\PLAISIO\\Desktop\\Web-Applications\\Uploads\\";
     private final ImageRepository imageRepository;
 
     @Transactional
@@ -31,7 +33,7 @@ public class ImageService {
         if (!uploadsDirectory.exists())
             uploadsDirectory.mkdir();
 
-        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "/");
+        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "\\");
 
         if (!auctionDirectory.exists())
             auctionDirectory.mkdir();
@@ -41,7 +43,7 @@ public class ImageService {
         for (MultipartFile multipartFile : multipartFiles) {
 
             String fileName = multipartFile.getOriginalFilename();
-            String filePath = this.uploadsDirectory + auction.getId() + "/" + fileName;
+            String filePath = this.uploadsDirectory + auction.getId() + "\\" + fileName;
 
             File file = new File(filePath);
 
@@ -56,11 +58,11 @@ public class ImageService {
                         auctionImages.add(new Image(filePath, auction));
 
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_UPLOAD_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_UPLOAD_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -70,7 +72,7 @@ public class ImageService {
     @Transactional
     public void updateImages(Auction auction, MultipartFile[] multipartFiles) {
 
-        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "/");
+        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "\\");
 
         for (File file : Objects.requireNonNull(auctionDirectory.listFiles()))
             file.delete();
@@ -88,13 +90,13 @@ public class ImageService {
 
         else {
 
-            File auctionDirectory = new File(this.uploadsDirectory + auctionID + "/");
+            File auctionDirectory = new File(this.uploadsDirectory + auctionID + "\\");
 
             try {
                 FileUtils.deleteDirectory(auctionDirectory);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_DELETION_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }

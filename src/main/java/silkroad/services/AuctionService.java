@@ -11,9 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import silkroad.dtos.auction.AuctionMapper;
 import silkroad.dtos.auction.request.AuctionPosting;
-import silkroad.dtos.auction.response.AuctionBasicDetails;
+import silkroad.dtos.auction.response.AuctionBrowsingBasicDetails;
+import silkroad.dtos.auction.response.AuctionBrowsingCompleteDetails;
 import silkroad.dtos.auction.response.AuctionCompleteDetails;
-import silkroad.dtos.auction.response.AuctionDto;
+import silkroad.dtos.auction.response.AuctionPurchaseDetails;
 import silkroad.dtos.page.PageResponse;
 import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
@@ -34,13 +35,14 @@ public class AuctionService {
     private final SearchHistoryRepository searchHistoryRepository;
 
     @Transactional
-    public void createAuction(String username, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
+    public void createAuction(Authentication authentication, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
         Set<Category> auctionCategories = this.categoryRepository.findAll(auctionDTO.getCategories());
 
         if (auctionCategories.size() != auctionDTO.getCategories().size())
             throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
 
+        String username = authentication.getName();
         User seller = new User(username);
 
         Auction auction = new Auction(auctionDTO.getName(), auctionDTO.getDescription(), auctionDTO.getEndDate(), auctionDTO.getBuyPrice(), auctionDTO.getFirstBid(), seller);
@@ -72,7 +74,6 @@ public class AuctionService {
         if (!auction.getSeller().getUsername().equals(username))
             throw new AuctionException(auctionID.toString(), AuctionException.BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
-
         auction.setAddress(auctionDTO.getAddress());
         auction.setName(auctionDTO.getName());
         auction.setDescription(auctionDTO.getDescription());
@@ -101,12 +102,12 @@ public class AuctionService {
         this.imageService.deleteImages(auctionID, true);
 
         if (this.auctionRepository.removeById(auctionID) == 0)
-            throw new AuctionException(auctionID.toString(), AuctionException.AT_LEAST_ONE_BID, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionID.toString(), AuctionException.EXPIRED, HttpStatus.BAD_REQUEST);
         else
             this.imageService.deleteImages(auctionID, false);
     }
 
-    public AuctionCompleteDetails getAuction(Authentication authentication, Long auctionID) {
+    public AuctionBrowsingCompleteDetails getAuction(Authentication authentication, Long auctionID) {
 
         Optional<Auction> optionalAuction = this.auctionRepository.fetchAuctionWithCompleteDetails(auctionID);
 
@@ -118,10 +119,10 @@ public class AuctionService {
             this.searchHistoryRepository.save(searchHistoryRecord);
         }
 
-        return this.auctionMapper.mapToAuctionCompleteDetails(optionalAuction.get());
+        return this.auctionMapper.mapToAuctionBrowsingCompleteDetails(optionalAuction.get());
     }
 
-    public PageResponse<AuctionBasicDetails> getAuctions(Integer page, Integer size, String textSearch, Double minimumPrice, Double maximumPrice, String category, String location, Boolean hasBuyPrice) {
+    public PageResponse<AuctionBrowsingBasicDetails> getAuctions(Integer page, Integer size, String textSearch, Double minimumPrice, Double maximumPrice, String category, String location, Boolean hasBuyPrice) {
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -142,7 +143,8 @@ public class AuctionService {
 
             if (location != null) {
                 Join<Auction, Address> addressJoin = root.join("address");
-                addressJoin.on(criteriaBuilder.equal(addressJoin.get("country"), location));
+//                addressJoin.on(criteriaBuilder.equal(addressJoin.get("country"), location));
+                auctionPredicates.add(criteriaBuilder.equal(addressJoin.get("country"), location));
             }
 
             if (textSearch != null) {
@@ -166,16 +168,19 @@ public class AuctionService {
 
         Page<Auction> auctionPage = this.auctionRepository.findByCriteria(Auction.class, Long.class, "id", pageRequest, auctionSpecification, "Auction.findAllByCriteria");
 
-        List<AuctionBasicDetails> auctionBasicDetailsList = this.auctionMapper.mapToAuctionsBasicDetails(auctionPage.getContent());
+        List<AuctionBrowsingBasicDetails> auctionBrowsingBasicDetailsList = this.auctionMapper.mapToAuctionBrowsingBasicDetailsList(auctionPage.getContent());
 
-        return new PageResponse<>(auctionBasicDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
+        return new PageResponse<>(auctionBrowsingBasicDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
 
     }
 
 
-    public PageResponse<AuctionDto> getUserAuctions(Authentication authentication, Integer page, Integer size, Boolean sold) {
+    public PageResponse<AuctionCompleteDetails> getUserAuctions(Authentication authentication, String userResource, Integer page, Integer size, Boolean sold, Boolean active) {
 
         String username = authentication.getName();
+
+        if (!userResource.equals(username))
+            throw new AuctionException(AuctionException.BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -185,16 +190,19 @@ public class AuctionService {
 
             auctionPredicates.add(criteriaBuilder.equal(root.get("seller").get("username"), username));
 
-          if (sold != null) {
+            if (sold != null) {
 
                 if (sold)
-                    auctionPredicates.add(Auction.isSold(root, criteriaBuilder));
+                    auctionPredicates.add(Auction.wasSold(root, criteriaBuilder));
                 else
-                    auctionPredicates.add(Auction.isExpired(root, criteriaBuilder));
+                    auctionPredicates.add(Auction.wasNotSold(root, criteriaBuilder));
+            } else if (active != null) {
+
+                if (active)
+                    auctionPredicates.add(Auction.isActive(root, criteriaBuilder));
+
             }
 
-            else
-                auctionPredicates.add(Auction.isActive(root, criteriaBuilder));
 
             return criteriaBuilder.and(auctionPredicates.toArray(new Predicate[0]));
 
@@ -203,10 +211,39 @@ public class AuctionService {
 
         Page<Auction> auctionPage = this.auctionRepository.findByCriteria(Auction.class, Long.class, "id", pageRequest, auctionSpecification, "Auction.findUserAuctionsByCriteria");
 
-        List<AuctionDto> auctionBasicDetailsList = this.auctionMapper.mapToAuctionsDtosDetails(auctionPage.getContent());
+        List<AuctionCompleteDetails> auctionBasicDetailsList = this.auctionMapper.mapToAuctionCompleteDetailsDetailsList(auctionPage.getContent());
 
         return new PageResponse<>(auctionBasicDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
-
     }
 
+    public PageResponse<AuctionPurchaseDetails> getUserPurchases(Authentication authentication, String userResource, Integer page, Integer size, String sortField, String sortDirection) {
+
+        String username = authentication.getName();
+
+        if (!userResource.equals(username))
+            throw new AuctionException(AuctionException.BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+
+        Specification<Auction> auctionSpecification = (root, query, criteriaBuilder) -> {
+
+            List<Predicate> auctionPredicates = new ArrayList<>();
+
+            Join<Auction, Bid> auctionBidJoin = root.join("latestBid");
+            auctionBidJoin.on(criteriaBuilder.and(criteriaBuilder.equal(auctionBidJoin.get("amount"), root.get("highestBid")), criteriaBuilder.equal(auctionBidJoin.get("bidder").get("username"), username)));
+//            auctionPredicates.add(criteriaBuilder.equal(root.get("latestBid").get("bidder").get("username"), username));
+            auctionPredicates.add(Auction.wasSold(root, criteriaBuilder));
+
+            return criteriaBuilder.and(auctionPredicates.toArray(new Predicate[0]));
+
+        };
+
+        Page<Auction> auctionPage = this.auctionRepository.findByCriteria(Auction.class, Long.class, "id", pageRequest, auctionSpecification, "Auction.findUserPurchasesByCriteria");
+
+        List<AuctionPurchaseDetails> auctionPurchaseDetailsList = this.auctionMapper.mapToAuctionPurchaseDetailsList(auctionPage.getContent());
+
+        return new PageResponse<>(auctionPurchaseDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
+
+    }
 }
