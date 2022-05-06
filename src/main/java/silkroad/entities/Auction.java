@@ -110,38 +110,4 @@ public class Auction {
         return getClass().hashCode();
     }
 
-    public static Predicate isActive(Root<Auction> root, CriteriaBuilder criteriaBuilder) {
-
-        Predicate isNotDue = criteriaBuilder.greaterThan(root.get("endDate"), TimeManager.now());
-
-        Predicate isBuyPricePresent = criteriaBuilder.isNotNull(root.get("buyPrice"));
-        Predicate isHighestBidLessThanBuyPrice = criteriaBuilder.lessThan(root.get("highestBid"), root.get("buyPrice"));
-
-        Predicate isBuyPriceAbsent = criteriaBuilder.isNull(root.get("buyPrice"));
-
-        return criteriaBuilder.and(isNotDue, criteriaBuilder.or(isBuyPriceAbsent, criteriaBuilder.and(isBuyPricePresent, isHighestBidLessThanBuyPrice)));
-    }
-
-    public static Predicate wasSold(Root<Auction> root, CriteriaBuilder criteriaBuilder) {
-
-        Predicate isBuyPricePresent = criteriaBuilder.isNotNull(root.get("buyPrice"));
-        Predicate isHighestBidHigherThanOrEqualToBuyPrice = criteriaBuilder.greaterThanOrEqualTo(root.get("highestBid"), root.get("buyPrice"));
-        Predicate wasSoldWithBuyPrice = criteriaBuilder.and(isBuyPricePresent, isHighestBidHigherThanOrEqualToBuyPrice);
-
-        Predicate isDue = criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), TimeManager.now());
-        Predicate bidsPresent = criteriaBuilder.greaterThanOrEqualTo(root.get("totalBids"), 1);
-        Predicate wasSold = criteriaBuilder.and(isDue, bidsPresent);
-
-        return criteriaBuilder.or(wasSoldWithBuyPrice, wasSold);
-    }
-
-    public static Predicate wasNotSold(Root<Auction> root, CriteriaBuilder criteriaBuilder) {
-
-        Predicate isDue = criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), TimeManager.now());
-        Predicate bidsAbsent = criteriaBuilder.equal(root.get("totalBids"), 0);
-
-        return criteriaBuilder.and(isDue, bidsAbsent);
-    }
-
-
 }

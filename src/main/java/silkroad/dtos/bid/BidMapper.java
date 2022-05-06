@@ -1,7 +1,8 @@
 package silkroad.dtos.bid;
 
 import org.mapstruct.*;
-import silkroad.dtos.bid.response.BidDetails;
+import silkroad.dtos.bid.response.BidBuyerDetails;
+import silkroad.dtos.bid.response.BidSellerDetails;
 import silkroad.entities.Bid;
 import java.util.List;
 
@@ -11,9 +12,15 @@ public interface BidMapper {
 
     @Mapping(target = "bidder", source = "bidder.username")
     @Mapping(target = "bidderRating", source = "bidder.buyerRating")
-    BidDetails mapBidToBidDetails(Bid bid);
+    BidSellerDetails mapBidToBidSellerDetails(Bid bid);
 
-    List<BidDetails> mapBidToBidsDetails(List<Bid> content);
+    List<BidSellerDetails> mapBidsToBidSellerDetailsList(List<Bid> bids);
+
+    @Mapping(target = "auctionName", source = "bid.auction.name")
+    @Mapping(target = "auctionID", source = "bid.auction.id")
+    BidBuyerDetails bidToBidBuyerDetails(Bid bid);
+
+    List<BidBuyerDetails> mapBidsToBidBuyerDetailsList(List<Bid> bids);
 
 
 }

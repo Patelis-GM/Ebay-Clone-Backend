@@ -15,4 +15,5 @@ public class AuctionBrowsingBasicDetails implements Serializable {
     private final Double highestBid;
     private final List<String> images;
     private final String country;
+
 }

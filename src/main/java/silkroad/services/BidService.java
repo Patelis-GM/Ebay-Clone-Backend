@@ -9,7 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import silkroad.dtos.bid.BidMapper;
-import silkroad.dtos.bid.response.BidDetails;
+import silkroad.dtos.bid.response.BidBuyerDetails;
+import silkroad.dtos.bid.response.BidSellerDetails;
 import silkroad.dtos.page.PageResponse;
 import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
@@ -46,7 +47,7 @@ public class BidService {
         Optional<Auction> optionalAuction = this.auctionRepository.findBiddableById(auctionID, bidDate, version);
 
         if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.MODIFIED_OR_EXPIRED, HttpStatus.NOT_FOUND);
+            throw new AuctionException(auctionID.toString(), AuctionException.MODIFIED_OR_EXPIRED, HttpStatus.BAD_REQUEST);
 
         Auction auction = optionalAuction.get();
 
@@ -89,19 +90,34 @@ public class BidService {
     }
 
 
-    public PageResponse<BidDetails> getBids(Long auctionID, Integer page, Integer size, String sortField, String sortDirection) {
+    public PageResponse<BidSellerDetails> getAuctionsBids(Authentication authentication, Long auctionID, Integer page, Integer size) {
 
-        PageRequest pageRequest;
+        if (!this.auctionRepository.existsById(auctionID))
+            throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
 
-        if (sortDirection.equals("asc"))
-            pageRequest = PageRequest.of(page, size, Sort.by(sortField).ascending());
-        else
-            pageRequest = PageRequest.of(page, size, Sort.by(sortField).descending());
+        if (!this.auctionRepository.findAuctionSellerById(auctionID).equals(authentication.getName()))
+            throw new AuctionException(AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Bid_.SUBMISSION_DATE).descending());
 
         Page<Bid> bidsPage = this.bidRepository.findByAuctionId(auctionID, pageRequest);
-        List<BidDetails> auctionBids = this.bidMapper.mapBidToBidsDetails(bidsPage.getContent());
+
+        List<BidSellerDetails> auctionBids = this.bidMapper.mapBidsToBidSellerDetailsList(bidsPage.getContent());
 
         return new PageResponse<>(auctionBids, bidsPage.getNumber() + 1, bidsPage.getTotalPages(), bidsPage.getTotalElements(), bidsPage.getNumberOfElements());
+    }
+
+    public PageResponse<BidBuyerDetails> getUserBids(Authentication authentication, String username, Integer page, Integer size) {
+
+        if (!authentication.getName().equals(username))
+            throw new BidException(BidException.USER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Bid_.SUBMISSION_DATE).descending());
+
+        Page<Bid> bidsPage = this.bidRepository.findByUserId(username, pageRequest);
+
+        List<BidBuyerDetails> userBids = this.bidMapper.mapBidsToBidBuyerDetailsList(bidsPage.getContent());
+
+        return new PageResponse<>(userBids, bidsPage.getNumber() + 1, bidsPage.getTotalPages(), bidsPage.getTotalElements(), bidsPage.getNumberOfElements());
     }
 }

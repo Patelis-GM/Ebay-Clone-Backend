@@ -34,7 +34,6 @@ public interface AuctionMapper {
 
     List<AuctionCompleteDetails> mapToAuctionCompleteDetailsDetailsList(List<Auction> auctions);
 
-
     @Mapping(target = "date", source = "latestBid.submissionDate")
     @Mapping(target = "cost", source = "latestBid.amount")
     @Mapping(target = "seller", source = "seller.username")

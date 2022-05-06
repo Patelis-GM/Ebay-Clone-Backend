@@ -29,15 +29,12 @@ public class CriteriaRepositoryImpl<T, ID> implements CriteriaRepository<T, ID> 
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
-        CriteriaQuery<ID> idQuery = criteriaBuilder.createQuery(idClass);
-        Root<T> root = idQuery.from(entityClass);
-        List<ID> ids = entityManager.createQuery(idQuery.select(root.get(idPath)).where(specification.toPredicate(root, idQuery, entityManager.getCriteriaBuilder()))).setFirstResult((int) pageRequest.getOffset()).setMaxResults(pageRequest.getPageSize()).getResultList();
+        CriteriaQuery<ID> idQuery = getIDQuery(entityClass, idClass, idPath, criteriaBuilder, specification);
+        List<ID> ids = entityManager.createQuery(idQuery).setFirstResult((int) pageRequest.getOffset()).setMaxResults(pageRequest.getPageSize()).getResultList();
 
-        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
-        Root<T> rootCount = countQuery.from(entityClass);
-        countQuery.select(criteriaBuilder.count(rootCount));
-        countQuery.where(specification.toPredicate(rootCount, countQuery, criteriaBuilder));
+        CriteriaQuery<Long> countQuery = getCountQuery(entityClass, criteriaBuilder, specification);
         Long count = entityManager.createQuery(countQuery).getSingleResult();
+
 
         TypedQuery<T> typedQuery = entityManager.createNamedQuery(qlString, entityClass);
         typedQuery.setParameter("ids", ids);
@@ -45,4 +42,22 @@ public class CriteriaRepositoryImpl<T, ID> implements CriteriaRepository<T, ID> 
 
         return new PageImpl<>(items, pageRequest, count);
     }
+
+
+    private CriteriaQuery<ID> getIDQuery(Class<T> entityClass, Class<ID> idClass, String idPath, CriteriaBuilder criteriaBuilder, Specification<T> specification) {
+        CriteriaQuery<ID> idQuery = criteriaBuilder.createQuery(idClass);
+        Root<T> root = idQuery.from(entityClass);
+        idQuery.select(root.get(idPath));
+        idQuery.where(specification.toPredicate(root, idQuery, criteriaBuilder));
+        return idQuery;
+    }
+
+    private CriteriaQuery<Long> getCountQuery(Class<T> entityClass, CriteriaBuilder criteriaBuilder, Specification<T> specification) {
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        Root<T> rootCount = countQuery.from(entityClass);
+        countQuery.select(criteriaBuilder.count(rootCount));
+        countQuery.where(specification.toPredicate(rootCount, countQuery, criteriaBuilder));
+        return countQuery;
+    }
+
 }

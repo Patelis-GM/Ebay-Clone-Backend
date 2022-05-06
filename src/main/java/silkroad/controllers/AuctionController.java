@@ -9,7 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 import silkroad.dtos.auction.request.AuctionPosting;
 import silkroad.dtos.auction.response.AuctionBrowsingBasicDetails;
 import silkroad.dtos.auction.response.AuctionBrowsingCompleteDetails;
-import silkroad.dtos.bid.response.BidDetails;
+import silkroad.dtos.bid.request.BidPosting;
+import silkroad.dtos.bid.response.BidSellerDetails;
 import silkroad.dtos.page.PageResponse;
 import silkroad.entities.Address;
 import silkroad.services.AddressService;
@@ -66,25 +67,24 @@ public class AuctionController {
                                                                                     @RequestParam(name = "buy-now", required = false) Boolean hasBuyPrice,
                                                                                     @RequestParam(name = "page") Integer pageIndex,
                                                                                     @RequestParam(name = "size") Integer pageSize) {
-        return new ResponseEntity<>(this.auctionService.getAuctions(pageIndex - 1, pageSize, textSearch, minPrice, maxPrice, category, location, hasBuyPrice), HttpStatus.OK);
+        return new ResponseEntity<>(this.auctionService.browseAuctions(pageIndex - 1, pageSize, textSearch, minPrice, maxPrice, category, location, hasBuyPrice), HttpStatus.OK);
     }
 
 
     /* Bid on Auction */
-    @RequestMapping(value = "/auctions/{auctionID}/{version}/bid", method = RequestMethod.POST)
-    public ResponseEntity<Void> bid(Authentication authentication, @PathVariable Long auctionID, @RequestParam(name = "amount") Double amount, @PathVariable Long version) {
-        this.bidService.bid(authentication, auctionID, amount, version);
+    @RequestMapping(value = "/auctions/{auctionID}/bid", method = RequestMethod.POST)
+    public ResponseEntity<Void> bid(Authentication authentication, @PathVariable Long auctionID, @RequestBody BidPosting bidPosting) {
+        this.bidService.bid(authentication, auctionID, bidPosting.getAmount(), bidPosting.getVersion());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /* Get Auction Bids */
     @RequestMapping(value = "/auctions/{auctionID}/bid", method = RequestMethod.GET)
-    public ResponseEntity<PageResponse<BidDetails>> getBids(@PathVariable Long auctionID,
-                                                            @RequestParam(name = "page") Integer pageIndex,
-                                                            @RequestParam("size") Integer pageSize,
-                                                            @RequestParam(value = "sort-by", required = false) String sortField,
-                                                            @RequestParam(value = "sort-direction", required = false) String sortDirection) {
-        return new ResponseEntity<>(this.bidService.getBids(auctionID, pageIndex - 1, pageSize, sortField, sortDirection), HttpStatus.OK);
+    public ResponseEntity<PageResponse<BidSellerDetails>> getAuctionBids(Authentication authentication,
+                                                                  @PathVariable Long auctionID,
+                                                                  @RequestParam(name = "page") Integer pageIndex,
+                                                                  @RequestParam("size") Integer pageSize) {
+        return new ResponseEntity<>(this.bidService.getAuctionsBids(authentication, auctionID, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
 
