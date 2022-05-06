@@ -24,9 +24,10 @@ public class AuctionBrowsingCompleteDetails implements Serializable {
     private final List<String> images;
     private final Address address;
     private final Boolean expired;
+    private final Long version;
 
 
-    public AuctionBrowsingCompleteDetails(Long id, String name, String description, Date endDate, Double buyPrice, Double firstBid, Long totalBids, Double highestBid, String sellerUsername, Double sellerRating, List<String> images, Address address) {
+    public AuctionBrowsingCompleteDetails(Long id, String name, String description, Date endDate, Double buyPrice, Double firstBid, Long totalBids, Double highestBid, String sellerUsername, Double sellerRating, List<String> images, Address address,Long version) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -40,5 +41,6 @@ public class AuctionBrowsingCompleteDetails implements Serializable {
         this.images = images;
         this.address = address;
         this.expired = ((TimeManager.now().getTime() >= this.endDate.getTime()) || (this.buyPrice != null && this.highestBid >= this.buyPrice));
+        this.version = version;
     }
 }

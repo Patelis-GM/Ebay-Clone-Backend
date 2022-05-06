@@ -16,10 +16,4 @@ public class BidController {
     private final BidService bidService;
 
 
-    @RequestMapping(value = "/bid1", method = RequestMethod.POST)
-    public ResponseEntity<Void> bid1(Authentication authentication, @RequestParam(name = "id") Long auctionID, @RequestParam(name = "amount") Double amount) {
-        this.bidService.bid("Kira.Ruecker3", auctionID, amount);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
 }

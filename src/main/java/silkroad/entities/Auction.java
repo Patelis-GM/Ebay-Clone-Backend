@@ -31,7 +31,7 @@ public class Auction {
         this.endDate = endDate;
         this.buyPrice = buyPrice;
         this.firstBid = firstBid;
-        this.highestBid = firstBid;
+        this.highestBid = 0.0;
         this.seller = seller;
         this.latestBid = null;
         this.totalBids = 0L;
@@ -80,6 +80,10 @@ public class Auction {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bid_id", nullable = true)
     private Bid latestBid;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @ManyToMany
     @JoinTable(

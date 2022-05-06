@@ -37,7 +37,7 @@ public class AuctionService {
     @Transactional
     public void createAuction(Authentication authentication, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
-        Set<Category> auctionCategories = this.categoryRepository.findAll(auctionDTO.getCategories());
+        Set<Category> auctionCategories = this.categoryRepository.findAllDistinct(auctionDTO.getCategories());
 
         if (auctionCategories.size() != auctionDTO.getCategories().size())
             throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
@@ -57,22 +57,27 @@ public class AuctionService {
     }
 
     @Transactional
-    public void updateAuction(String username, Long auctionID, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
+    public void updateAuction(Authentication authentication, Long auctionID, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
-        Set<Category> auctionCategories = this.categoryRepository.findAll(auctionDTO.getCategories());
+        if (!this.auctionRepository.existsById(auctionID))
+            throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
 
-        if (auctionCategories.size() != auctionDTO.getCategories().size())
-            throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
+        if (!this.auctionRepository.findAuctionSeller(auctionID).equals(authentication.getName()))
+            throw new AuctionException(auctionID.toString(), AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
-        Optional<Auction> optionalAuction = this.auctionRepository.findByIdWithPessimisticLock(auctionID);
+        Optional<Auction> optionalAuction = this.auctionRepository.findUpdatableById(auctionID);
 
         if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new AuctionException(auctionID.toString(), AuctionException.HAS_BID, HttpStatus.BAD_REQUEST);
 
         Auction auction = optionalAuction.get();
 
-        if (!auction.getSeller().getUsername().equals(username))
-            throw new AuctionException(auctionID.toString(), AuctionException.BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+        Set<Category> auctionCategories = this.categoryRepository.findAllDistinct(auctionDTO.getCategories());
+
+        System.out.println(auctionCategories);
+
+        if (auctionCategories.size() != auctionDTO.getCategories().size())
+            throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
 
         auction.setAddress(auctionDTO.getAddress());
         auction.setName(auctionDTO.getName());
@@ -81,31 +86,27 @@ public class AuctionService {
         auction.setBuyPrice(auctionDTO.getBuyPrice());
         auction.setFirstBid(auctionDTO.getFirstBid());
         auction.setCategories(auctionCategories);
-        this.auctionRepository.save(auction);
 
         this.imageService.updateImages(auction, multipartFiles);
     }
 
     @Transactional
-    public void deleteAuction(String username, Long auctionID) {
+    public void deleteAuction(Authentication authentication, Long auctionID) {
 
-        Optional<Auction> optionalAuction = this.auctionRepository.findByIdWithPessimisticLock(auctionID);
+        if (!this.auctionRepository.existsById(auctionID))
+            throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
 
-        if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
-
-        Auction auction = optionalAuction.get();
-
-        if (!auction.getSeller().getUsername().equals(username))
-            throw new AuctionException(auctionID.toString(), AuctionException.BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+        if (!this.auctionRepository.findAuctionSeller(auctionID).equals(authentication.getName()))
+            throw new AuctionException(auctionID.toString(), AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
         this.imageService.deleteImages(auctionID, true);
 
         if (this.auctionRepository.removeById(auctionID) == 0)
-            throw new AuctionException(auctionID.toString(), AuctionException.EXPIRED, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionID.toString(), AuctionException.HAS_BID, HttpStatus.BAD_REQUEST);
         else
             this.imageService.deleteImages(auctionID, false);
     }
+
 
     public AuctionBrowsingCompleteDetails getAuction(Authentication authentication, Long auctionID) {
 
@@ -174,13 +175,12 @@ public class AuctionService {
 
     }
 
-
     public PageResponse<AuctionCompleteDetails> getUserAuctions(Authentication authentication, String userResource, Integer page, Integer size, Boolean sold, Boolean active) {
 
         String username = authentication.getName();
 
         if (!userResource.equals(username))
-            throw new AuctionException(AuctionException.BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+            throw new AuctionException(AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -221,7 +221,7 @@ public class AuctionService {
         String username = authentication.getName();
 
         if (!userResource.equals(username))
-            throw new AuctionException(AuctionException.BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+            throw new AuctionException(AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
