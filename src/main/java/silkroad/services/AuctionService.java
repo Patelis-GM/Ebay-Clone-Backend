@@ -21,7 +21,6 @@ import silkroad.exceptions.AuctionException;
 import silkroad.repositories.*;
 import silkroad.specifications.AuctionSpecificationBuilder;
 
-import javax.persistence.criteria.*;
 import java.util.*;
 
 @Service
@@ -75,7 +74,6 @@ public class AuctionService {
 
         Set<Category> auctionCategories = this.categoryRepository.findAllDistinct(auctionDTO.getCategories());
 
-        System.out.println(auctionCategories);
 
         if (auctionCategories.size() != auctionDTO.getCategories().size())
             throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
@@ -102,10 +100,12 @@ public class AuctionService {
 
         this.imageService.deleteImages(auctionID, true);
 
+        this.searchHistoryRepository.deleteByAuctionId(auctionID);
+
         if (this.auctionRepository.removeById(auctionID) == 0)
             throw new AuctionException(auctionID.toString(), AuctionException.HAS_BID, HttpStatus.BAD_REQUEST);
-        else
-            this.imageService.deleteImages(auctionID, false);
+
+        this.imageService.deleteImages(auctionID, false);
     }
 
 

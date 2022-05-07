@@ -92,10 +92,8 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     Set<Category> categories = new HashSet<>();
 
-
     @OneToMany(mappedBy = "auction")
     private Set<Image> images = new HashSet<>();
-
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({

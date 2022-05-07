@@ -10,8 +10,12 @@ import silkroad.dtos.auction.response.AuctionCompleteDetails;
 import silkroad.dtos.auction.response.AuctionPurchaseDetails;
 import silkroad.dtos.bid.response.BidBuyerDetails;
 import silkroad.dtos.page.PageResponse;
+import silkroad.dtos.user.request.UserRegistration;
+import silkroad.entities.Address;
+import silkroad.services.AddressService;
 import silkroad.services.AuctionService;
 import silkroad.services.BidService;
+import silkroad.services.UserService;
 
 @AllArgsConstructor
 @RestController
@@ -19,7 +23,18 @@ public class UserController {
 
     private final AuctionService auctionService;
     private final BidService bidService;
+    private final UserService userService;
+    private final AddressService addressService;
 
+
+    /* Create User */
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public ResponseEntity<Void> signUp(@RequestBody UserRegistration user) {
+        Address address = this.addressService.createOrFindAddress(user.getAddress());
+        user.setAddress(address);
+        this.userService.signUpUser(user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/users/{username}/auctions", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<AuctionCompleteDetails>> getUserPostedAuctions(Authentication authentication,
@@ -40,6 +55,14 @@ public class UserController {
         return new ResponseEntity<>(this.auctionService.getUserPurchasedAuctions(authentication, username, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
+
+    @RequestMapping(value = "/users/{username}/bids", method = RequestMethod.GET)
+    public ResponseEntity<PageResponse<BidBuyerDetails>> getUserBids(Authentication authentication,
+                                                                     @PathVariable String username,
+                                                                     @RequestParam(name = "page") Integer pageIndex,
+                                                                     @RequestParam(name = "size") Integer pageSize) {
+        return new ResponseEntity<>(this.bidService.getUserBids(authentication, username, pageIndex - 1, pageSize), HttpStatus.OK);
+    }
 
     @RequestMapping(value = "/users/{username}/bids", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<BidBuyerDetails>> getUserBids(Authentication authentication,

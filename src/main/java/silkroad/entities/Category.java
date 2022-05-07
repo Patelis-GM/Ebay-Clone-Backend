@@ -14,7 +14,6 @@ import java.util.Set;
 @Table(name = "category")
 @Getter
 @Setter
-@ToString
 public class Category {
 
     @Id
@@ -22,7 +21,6 @@ public class Category {
     private String name;
 
     @ManyToMany(mappedBy = "categories")
-    @ToString.Exclude
     Set<Auction> auctions = new HashSet<>();
 
     @Override
@@ -38,8 +36,8 @@ public class Category {
         return getClass().hashCode();
     }
 
-//    @Override
-//    public String toString() {
-//        return this.name;
-//    }
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

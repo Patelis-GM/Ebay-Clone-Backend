@@ -73,6 +73,12 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "auction_id")})
     private Set<Auction> searchHistory = new HashSet<>();
 
+    @OneToMany(mappedBy = "sender")
+    private Set<Message> sentMessages = new HashSet<>();
+
+    @OneToMany(mappedBy = "recipient")
+    private Set<Message> receivedMessages = new HashSet<>();
+
     public User(String username) {
         this.username = username;
     }
