@@ -3,10 +3,12 @@ package silkroad.entities;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 import silkroad.utilities.TimeManager;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "message")
@@ -21,24 +23,18 @@ public class Message {
     private Long id;
 
     @Lob
-    @Column(name = "title", nullable = false, updatable = false)
+    @Column(name = "title", nullable = false)
     private String title;
 
     @Lob
-    @Column(name = "body", nullable = false, updatable = false)
+    @Column(name = "body", nullable = false)
     private String body;
 
-    @Column(name = "creation_date", nullable = false, updatable = false)
+    @Column(name = "creation_date", nullable = false)
     private Date creationDate;
 
-    @Column(name = "read", nullable = false)
+    @Column(name = "is_read", nullable = false)
     private Boolean read;
-
-    @Column(name = "deleted_by_sender", nullable = false)
-    private Boolean deletedBySender;
-
-    @Column(name = "deleted_by_recipient", nullable = false)
-    private Boolean deletedByRecipient;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender", nullable = false)
@@ -54,10 +50,20 @@ public class Message {
         this.body = body;
         this.sender = sender;
         this.recipient = recipient;
-        this.read = false;
         this.creationDate = TimeManager.now();
-        this.deletedBySender = false;
-        this.deletedByRecipient = false;
+        this.read = false;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Message message = (Message) o;
+        return id != null && Objects.equals(id, message.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import silkroad.dtos.auction.response.AuctionCompleteDetails;
 import silkroad.dtos.auction.response.AuctionPurchaseDetails;
 import silkroad.dtos.bid.response.BidBuyerDetails;
+import silkroad.dtos.message.request.MessagePosting;
 import silkroad.dtos.page.PageResponse;
 import silkroad.dtos.user.request.UserRegistration;
 import silkroad.entities.Address;
-import silkroad.services.AddressService;
-import silkroad.services.AuctionService;
-import silkroad.services.BidService;
-import silkroad.services.UserService;
+import silkroad.exceptions.UserException;
+import silkroad.services.*;
 
 @AllArgsConstructor
 @RestController
@@ -25,6 +24,7 @@ public class UserController {
     private final BidService bidService;
     private final UserService userService;
     private final AddressService addressService;
+    private final MessageService messageService;
 
 
     /* Create User */
@@ -38,21 +38,22 @@ public class UserController {
 
     @RequestMapping(value = "/users/{username}/auctions", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<AuctionCompleteDetails>> getUserPostedAuctions(Authentication authentication,
-                                                                             @PathVariable String username,
-                                                                             @RequestParam(name = "sold", required = false) Boolean sold,
-                                                                             @RequestParam(name = "active", required = false) Boolean active,
-                                                                             @RequestParam(name = "page") Integer pageIndex,
-                                                                             @RequestParam(name = "size") Integer pageSize) {
-        return new ResponseEntity<>(this.auctionService.getUserPostedAuctions(authentication, username, pageIndex - 1, pageSize, active, sold), HttpStatus.OK);
+                                                                                      @PathVariable String username,
+                                                                                      @RequestParam(name = "sold", required = false) Boolean sold,
+                                                                                      @RequestParam(name = "active", required = false) Boolean active,
+                                                                                      @RequestParam(name = "page") Integer pageIndex,
+                                                                                      @RequestParam(name = "size") Integer pageSize) {
+        UserException.validateAuthentication(authentication, username);
+        return new ResponseEntity<>(this.auctionService.getUserPostedAuctions(authentication, pageIndex - 1, pageSize, active, sold), HttpStatus.OK);
     }
-
 
     @RequestMapping(value = "/users/{username}/purchases", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<AuctionPurchaseDetails>> getUserPurchasedAuctions(Authentication authentication,
-                                                                              @PathVariable String username,
-                                                                              @RequestParam(name = "page") Integer pageIndex,
-                                                                              @RequestParam(name = "size") Integer pageSize) {
-        return new ResponseEntity<>(this.auctionService.getUserPurchasedAuctions(authentication, username, pageIndex - 1, pageSize), HttpStatus.OK);
+                                                                                         @PathVariable String username,
+                                                                                         @RequestParam(name = "page") Integer pageIndex,
+                                                                                         @RequestParam(name = "size") Integer pageSize) {
+        UserException.validateAuthentication(authentication, username);
+        return new ResponseEntity<>(this.auctionService.getUserPurchasedAuctions(authentication, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
 
@@ -61,15 +62,49 @@ public class UserController {
                                                                      @PathVariable String username,
                                                                      @RequestParam(name = "page") Integer pageIndex,
                                                                      @RequestParam(name = "size") Integer pageSize) {
-        return new ResponseEntity<>(this.bidService.getUserBids(authentication, username, pageIndex - 1, pageSize), HttpStatus.OK);
+        UserException.validateAuthentication(authentication, username);
+        return new ResponseEntity<>(this.bidService.getUserBids(authentication, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/users/{username}/bids", method = RequestMethod.GET)
-    public ResponseEntity<PageResponse<BidBuyerDetails>> getUserBids(Authentication authentication,
-                                                                     @PathVariable String username,
-                                                                     @RequestParam(name = "page") Integer pageIndex,
-                                                                     @RequestParam(name = "size") Integer pageSize) {
-        return new ResponseEntity<>(this.bidService.getUserBids(authentication, username, pageIndex - 1, pageSize), HttpStatus.OK);
+
+    @RequestMapping(value = "/users/{username}/messages", method = RequestMethod.POST)
+    public ResponseEntity<Void> sendMessage(Authentication authentication,
+                                            @PathVariable String username,
+                                            @RequestBody MessagePosting messagePosting) {
+        UserException.validateAuthentication(authentication, username);
+        this.messageService.sendMessage(authentication, messagePosting);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/users/{username}/messages", method = RequestMethod.GET)
+    public ResponseEntity<PageResponse<?>> getUserMessages(Authentication authentication,
+                                                           @PathVariable String username,
+                                                           @RequestParam(name = "sent") Boolean sent,
+                                                           @RequestParam(name = "page") Integer pageIndex,
+                                                           @RequestParam(name = "size") Integer pageSize) {
+        UserException.validateAuthentication(authentication, username);
+        if (sent)
+            return new ResponseEntity<>(this.messageService.getUserSentMessages(authentication, pageIndex - 1, pageSize), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(this.messageService.getUserReceivedMessages(authentication, pageIndex - 1, pageSize), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/users/{username}/messages/{messageID}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteUserMessage(Authentication authentication,
+                                                  @PathVariable String username,
+                                                  @PathVariable Long messageID) {
+        UserException.validateAuthentication(authentication, username);
+        this.messageService.deleteUserMessage(authentication, messageID);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/users/{username}/messages/{messageID}", method = RequestMethod.PUT)
+    public ResponseEntity<Void> readUserMessage(Authentication authentication,
+                                                @PathVariable String username,
+                                                @PathVariable Long messageID) {
+        UserException.validateAuthentication(authentication, username);
+        this.messageService.readUserMessage(authentication, messageID);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

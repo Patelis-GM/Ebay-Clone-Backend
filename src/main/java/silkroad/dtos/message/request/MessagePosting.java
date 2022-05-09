@@ -8,6 +8,5 @@ import java.io.Serializable;
 public class MessagePosting implements Serializable {
     private final String title;
     private final String body;
-    private final String sender;
     private final String recipient;
 }

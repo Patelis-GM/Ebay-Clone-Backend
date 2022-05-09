@@ -107,14 +107,11 @@ public class BidService {
         return new PageResponse<>(auctionBids, bidsPage.getNumber() + 1, bidsPage.getTotalPages(), bidsPage.getTotalElements(), bidsPage.getNumberOfElements());
     }
 
-    public PageResponse<BidBuyerDetails> getUserBids(Authentication authentication, String username, Integer page, Integer size) {
-
-        if (!authentication.getName().equals(username))
-            throw new BidException(BidException.USER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+    public PageResponse<BidBuyerDetails> getUserBids(Authentication authentication, Integer page, Integer size) {
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Bid_.SUBMISSION_DATE).descending());
 
-        Page<Bid> bidsPage = this.bidRepository.findByUserId(username, pageRequest);
+        Page<Bid> bidsPage = this.bidRepository.findByUserId(authentication.getName(), pageRequest);
 
         List<BidBuyerDetails> userBids = this.bidMapper.mapBidsToBidBuyerDetailsList(bidsPage.getContent());
 

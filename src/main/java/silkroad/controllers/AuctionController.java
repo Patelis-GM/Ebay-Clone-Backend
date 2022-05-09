@@ -67,6 +67,7 @@ public class AuctionController {
                                                                                     @RequestParam(name = "buy-now", required = false) Boolean hasBuyPrice,
                                                                                     @RequestParam(name = "page") Integer pageIndex,
                                                                                     @RequestParam(name = "size") Integer pageSize) {
+        System.out.println(textSearch);
         return new ResponseEntity<>(this.auctionService.browseAuctions(pageIndex - 1, pageSize, textSearch, minPrice, maxPrice, category, location, hasBuyPrice), HttpStatus.OK);
     }
 

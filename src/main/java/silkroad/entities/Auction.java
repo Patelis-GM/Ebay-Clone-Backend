@@ -103,6 +103,10 @@ public class Auction {
     private Address address;
 
 
+    @ManyToMany(mappedBy = "searchHistory")
+    private Set<User> seenBy = new LinkedHashSet<>();
+
+
     @Override
     public int hashCode() {
         return getClass().hashCode();

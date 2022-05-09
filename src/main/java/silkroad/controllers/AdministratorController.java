@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import silkroad.dtos.page.PageResponse;
 import silkroad.dtos.user.response.UserBasicDetails;
 import silkroad.dtos.user.response.UserCompleteDetails;
+import silkroad.entities.Auction;
+import silkroad.services.AuctionService;
 import silkroad.services.UserService;
 
 @AllArgsConstructor
@@ -15,6 +17,7 @@ import silkroad.services.UserService;
 public class AdministratorController {
 
     private final UserService userService;
+    private final AuctionService auctionService;
 
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
@@ -33,8 +36,14 @@ public class AdministratorController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/auctions/export", method = RequestMethod.GET)
+    public ResponseEntity<Void> exportAuctions(@RequestParam(name = "format") String format,
+                                               @RequestParam(name = "from") Long from,
+                                               @RequestParam(name = "to") Long to) {
 
-
+        this.auctionService.exportAuctions(format,from,to);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 
 }

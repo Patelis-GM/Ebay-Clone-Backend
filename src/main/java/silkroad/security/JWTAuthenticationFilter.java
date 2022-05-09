@@ -3,6 +3,7 @@ package silkroad.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,7 +43,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
         String JSONWebToken = JWTUtilities.generateJWT(authentication);
         response.setContentType(APPLICATION_JSON_VALUE);
-        response.setHeader(JWTUtilities.JWT_RESPONSE_HEADER, JSONWebToken);
+        response.setHeader(HttpHeaders.AUTHORIZATION, JSONWebToken);
     }
 
 

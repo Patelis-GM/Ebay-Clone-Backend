@@ -116,12 +116,14 @@ public class AuctionService {
         if (optionalAuction.isEmpty())
             throw new AuctionException(auctionID.toString(), AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
 
+        Auction auction = optionalAuction.get();
+
         if (authentication != null) {
-            SearchHistory searchHistoryRecord = new SearchHistory(new SearchHistoryID(auctionID, authentication.getName()), optionalAuction.get(), this.userRepository.getById(authentication.getName()));
+            SearchHistory searchHistoryRecord = new SearchHistory(new SearchHistoryID(auctionID, authentication.getName()), auction, this.userRepository.getById(authentication.getName()));
             this.searchHistoryRepository.save(searchHistoryRecord);
         }
 
-        return this.auctionMapper.mapToAuctionBrowsingCompleteDetails(optionalAuction.get());
+        return this.auctionMapper.mapToAuctionBrowsingCompleteDetails(auction);
     }
 
 
@@ -139,12 +141,9 @@ public class AuctionService {
 
     }
 
-    public PageResponse<AuctionCompleteDetails> getUserPostedAuctions(Authentication authentication, String userResource, Integer page, Integer size, Boolean active, Boolean sold) {
+    public PageResponse<AuctionCompleteDetails> getUserPostedAuctions(Authentication authentication, Integer page, Integer size, Boolean active, Boolean sold) {
 
         String username = authentication.getName();
-
-        if (!userResource.equals(username))
-            throw new AuctionException(AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -157,12 +156,9 @@ public class AuctionService {
         return new PageResponse<>(auctionBasicDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
     }
 
-    public PageResponse<AuctionPurchaseDetails> getUserPurchasedAuctions(Authentication authentication, String userResource, Integer page, Integer size) {
+    public PageResponse<AuctionPurchaseDetails> getUserPurchasedAuctions(Authentication authentication, Integer page, Integer size) {
 
         String username = authentication.getName();
-
-        if (!userResource.equals(username))
-            throw new AuctionException(AuctionException.BUYER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -173,6 +169,12 @@ public class AuctionService {
         List<AuctionPurchaseDetails> auctionPurchaseDetailsList = this.auctionMapper.mapToAuctionPurchaseDetailsList(auctionPage.getContent());
 
         return new PageResponse<>(auctionPurchaseDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
+
+    }
+
+    public void exportAuctions(String format, Long from, Long to) {
+        Date fromDate = new Date(from);
+        Date toDate = new Date(to);
 
     }
 }

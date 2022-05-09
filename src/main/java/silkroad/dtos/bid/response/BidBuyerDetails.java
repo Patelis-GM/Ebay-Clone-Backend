@@ -12,6 +12,6 @@ public class BidBuyerDetails implements Serializable {
     private final Long auctionID;
     private final String auctionName;
     private final Double amount;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "CET")
     private final Date submissionDate;
 }

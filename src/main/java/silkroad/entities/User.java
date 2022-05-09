@@ -4,14 +4,13 @@ package silkroad.entities;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import org.springframework.data.domain.Persistable;
-import org.springframework.security.core.Authentication;
+import org.hibernate.Hibernate;
 import silkroad.utilities.TimeManager;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -71,13 +70,27 @@ public class User {
             name = "searchhistory",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "auction_id")})
-    private Set<Auction> searchHistory = new HashSet<>();
+    private Set<Auction> searchHistory = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "messageaccess",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "message_id"))
+    private Set<Message> accessedMessages = new LinkedHashSet<>();
+
+    public void grantAccessToMessage(Message message) {
+        this.accessedMessages.add(message);
+    }
+
+    public void removeAccessToMessage(Message message) {
+        this.accessedMessages.remove(message);
+    }
 
     @OneToMany(mappedBy = "sender")
-    private Set<Message> sentMessages = new HashSet<>();
+    private Set<Message> sentMessages = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "recipient")
-    private Set<Message> receivedMessages = new HashSet<>();
+    private Set<Message> receivedMessages = new LinkedHashSet<>();
 
     public User(String username) {
         this.username = username;
@@ -99,7 +112,17 @@ public class User {
         this.joinDate = TimeManager.now();
     }
 
-    public void searched(Auction auction) {
-        this.searchHistory.add(auction);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return username != null && Objects.equals(username, user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
