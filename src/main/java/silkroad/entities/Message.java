@@ -33,7 +33,7 @@ public class Message {
     @Column(name = "creation_date", nullable = false)
     private Date creationDate;
 
-    @Column(name = "is_read", nullable = false)
+    @Column(name = "read", nullable = false)
     private Boolean read;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

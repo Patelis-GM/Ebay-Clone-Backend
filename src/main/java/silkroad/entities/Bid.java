@@ -2,18 +2,16 @@ package silkroad.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "bid")
 @Getter
 @Setter
-@NamedQueries({
-        @NamedQuery(name = "Bid.findUserPurchasesByCriteria", query = "SELECT b FROM Bid b JOIN FETCH b.auction bidAuction JOIN FETCH bidAuction.images WHERE b.id in :ids")
-})
 public class Bid {
 
     @Id
@@ -36,4 +34,16 @@ public class Bid {
     @Temporal(TemporalType.TIMESTAMP)
     private Date submissionDate;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Bid bid = (Bid) o;
+        return id != null && Objects.equals(id, bid.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

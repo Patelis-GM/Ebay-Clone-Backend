@@ -1,5 +1,10 @@
 package silkroad.services;
 
+import com.ctc.wstx.api.WstxOutputProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +25,8 @@ import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
 import silkroad.repositories.*;
 import silkroad.specifications.AuctionSpecificationBuilder;
+import silkroad.views.xml.AuctionXMLCollection;
+import silkroad.views.xml.XMLMapper;
 
 import java.util.*;
 
@@ -33,6 +40,7 @@ public class AuctionService {
     private final ImageService imageService;
     private final AuctionMapper auctionMapper;
     private final SearchHistoryRepository searchHistoryRepository;
+    private final XMLMapper xmlExportMapper;
 
     @Transactional
     public void createAuction(Authentication authentication, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
@@ -133,7 +141,7 @@ public class AuctionService {
 
         Specification<Auction> auctionSpecification = AuctionSpecificationBuilder.getAuctionsBrowsingSpecification(textSearch, minimumPrice, maximumPrice, category, location, hasBuyPrice);
 
-        Page<Auction> auctionPage = this.auctionRepository.findByCriteria(Auction.class, Long.class, Auction_.ID, pageRequest, auctionSpecification, "Auction.findAllByCriteria");
+        Page<Auction> auctionPage = this.auctionRepository.browseAuctions(auctionSpecification, pageRequest);
 
         List<AuctionBrowsingBasicDetails> auctionBrowsingBasicDetailsList = this.auctionMapper.mapToAuctionBrowsingBasicDetailsList(auctionPage.getContent());
 
@@ -149,7 +157,7 @@ public class AuctionService {
 
         Specification<Auction> auctionSpecification = AuctionSpecificationBuilder.getUserPostedAuctionsSpecification(username, active, sold);
 
-        Page<Auction> auctionPage = this.auctionRepository.findByCriteria(Auction.class, Long.class, Auction_.ID, pageRequest, auctionSpecification, "Auction.findUserAuctionsByCriteria");
+        Page<Auction> auctionPage = this.auctionRepository.getUserAuctions(auctionSpecification, pageRequest);
 
         List<AuctionCompleteDetails> auctionBasicDetailsList = this.auctionMapper.mapToAuctionCompleteDetailsDetailsList(auctionPage.getContent());
 
@@ -164,7 +172,7 @@ public class AuctionService {
 
         Specification<Auction> auctionSpecification = AuctionSpecificationBuilder.getUserPurchasedAuctionsSpecification(username);
 
-        Page<Auction> auctionPage = this.auctionRepository.findByCriteria(Auction.class, Long.class, Auction_.ID, pageRequest, auctionSpecification, "Auction.findUserPurchasesByCriteria");
+        Page<Auction> auctionPage = this.auctionRepository.getUserPurchases(auctionSpecification, pageRequest);
 
         List<AuctionPurchaseDetails> auctionPurchaseDetailsList = this.auctionMapper.mapToAuctionPurchaseDetailsList(auctionPage.getContent());
 
@@ -172,9 +180,18 @@ public class AuctionService {
 
     }
 
-    public void exportAuctions(String format, Long from, Long to) {
-        Date fromDate = new Date(from);
-        Date toDate = new Date(to);
+    public String exportAuctions(String format, Long from, Long to) throws JsonProcessingException {
 
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.getFactory().getXMLOutputFactory().setProperty(WstxOutputProperties.P_AUTOMATIC_END_ELEMENTS, false);
+        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        xmlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+
+        List<Auction> auctions = this.auctionRepository.exportAuctions();
+        System.out.println(auctions.size());
+
+        AuctionXMLCollection auctionXMLCollection = new AuctionXMLCollection(xmlExportMapper.map(auctions));
+        return xmlMapper.writeValueAsString(auctionXMLCollection);
     }
 }

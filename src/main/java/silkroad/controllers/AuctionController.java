@@ -67,7 +67,7 @@ public class AuctionController {
                                                                                     @RequestParam(name = "buy-now", required = false) Boolean hasBuyPrice,
                                                                                     @RequestParam(name = "page") Integer pageIndex,
                                                                                     @RequestParam(name = "size") Integer pageSize) {
-        System.out.println(textSearch);
+
         return new ResponseEntity<>(this.auctionService.browseAuctions(pageIndex - 1, pageSize, textSearch, minPrice, maxPrice, category, location, hasBuyPrice), HttpStatus.OK);
     }
 
@@ -85,7 +85,7 @@ public class AuctionController {
                                                                   @PathVariable Long auctionID,
                                                                   @RequestParam(name = "page") Integer pageIndex,
                                                                   @RequestParam("size") Integer pageSize) {
-        return new ResponseEntity<>(this.bidService.getAuctionsBids(authentication, auctionID, pageIndex - 1, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(this.bidService.getAuctionBids(authentication, auctionID, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
 

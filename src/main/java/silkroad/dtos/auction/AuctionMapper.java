@@ -18,18 +18,18 @@ public interface AuctionMapper {
 
     @Mapping(target = "sellerRating", source = "seller.sellerRating")
     @Mapping(target = "sellerUsername", source = "seller.username")
-    @Mapping(target = "images", expression = "java(imagesToImagePaths(auction.getImages()))")
+    @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
     AuctionBrowsingCompleteDetails mapToAuctionBrowsingCompleteDetails(Auction auction);
 
     @Mapping(source = "address.country", target = "country")
-    @Mapping(target = "images", expression = "java(imagesToImagePaths(auction.getImages()))")
+    @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
     AuctionBrowsingBasicDetails mapToAuctionBrowsingBasicDetails(Auction auction);
 
     List<AuctionBrowsingBasicDetails> mapToAuctionBrowsingBasicDetailsList(List<Auction> auctions);
 
     @Mapping(source = "latestBid.bidder.username", target = "bidder")
-    @Mapping(target = "categories", expression = "java(categoriesToCategoryNames(auction.getCategories()))")
-    @Mapping(target = "images", expression = "java(imagesToImagePaths(auction.getImages()))")
+    @Mapping(target = "categories", expression = "java(mapCategories(auction.getCategories()))")
+    @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
     AuctionCompleteDetails mapToAuctionCompleteDetails(Auction auction);
 
     List<AuctionCompleteDetails> mapToAuctionCompleteDetailsDetailsList(List<Auction> auctions);
@@ -37,19 +37,18 @@ public interface AuctionMapper {
     @Mapping(target = "date", source = "latestBid.submissionDate")
     @Mapping(target = "cost", source = "latestBid.amount")
     @Mapping(target = "seller", source = "seller.username")
-    @Mapping(target = "images", expression = "java(imagesToImagePaths(auction.getImages()))")
+    @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
     AuctionPurchaseDetails auctionToAuctionPurchaseDetails(Auction auction);
 
 
     List<AuctionPurchaseDetails> mapToAuctionPurchaseDetailsList(List<Auction> auctions);
 
 
-    default List<String> imagesToImagePaths(Set<Image> images) {
+    default List<String> mapImages(Set<Image> images) {
         return images.stream().map(Image::getPath).collect(Collectors.toList());
     }
 
-
-    default Set<String> categoriesToCategoryNames(Set<Category> categories) {
+    default Set<String> mapCategories(Set<Category> categories) {
         return categories.stream().map(Category::getName).collect(Collectors.toSet());
     }
 

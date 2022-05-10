@@ -8,5 +8,8 @@ public class TimeManager {
         return new Date(System.currentTimeMillis());
     }
 
+    public static Date toDate(Long milliseconds) {
+        return new Date(milliseconds);
+    }
 
 }

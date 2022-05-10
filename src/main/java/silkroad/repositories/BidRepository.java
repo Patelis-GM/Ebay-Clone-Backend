@@ -15,8 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public interface BidRepository extends JpaRepository<Bid, Long>, CriteriaRepository<Bid, Long> {
-
+public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @Query("SELECT b from Bid b WHERE b.auction.id = ?1 and b.bidder.username = ?2")
     Optional<Bid> findByAuctionAndBidder(Long auctionID, String username);
@@ -26,9 +25,11 @@ public interface BidRepository extends JpaRepository<Bid, Long>, CriteriaReposit
     @Query("UPDATE Auction a SET a.latestBid = ?2, a.highestBid = ?3, a.totalBids =?4 WHERE a.id = ?1")
     Integer bid(Long auctionID, Bid bid, Double amount, Long totalBids);
 
+
     @Query(value = "SELECT b FROM Bid b JOIN FETCH b.bidder WHERE b.auction.id = ?1",
             countQuery = "SELECT COUNT(b) FROM Bid b WHERE b.auction.id = ?1")
     Page<Bid> findByAuctionId(Long auctionID, Pageable pageable);
+
 
     @Query(value = "SELECT b FROM Bid b JOIN FETCH b.auction WHERE b.bidder.username = ?1",
             countQuery = "SELECT COUNT(b) FROM Bid b WHERE b.bidder.username = ?1")

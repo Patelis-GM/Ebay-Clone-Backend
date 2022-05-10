@@ -8,10 +8,11 @@ import silkroad.entities.Auction;
 
 import javax.persistence.LockModeType;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AuctionRepository extends JpaRepository<Auction, Long>, JpaSpecificationExecutor<Auction>, CriteriaRepository<Auction, Long> {
+public interface AuctionRepository extends JpaRepository<Auction, Long>, JpaSpecificationExecutor<Auction>, CriteriaRepository<Auction, Long>, CustomAuctionRepository {
 
     @Transactional
     @Query("SELECT a FROM Auction a WHERE " +
@@ -39,4 +40,9 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, JpaSpec
     Optional<Auction> fetchAuctionWithCompleteDetails(Long auctionID);
 
 
+    @Query("SELECT DISTINCT a FROM Auction a JOIN FETCH a.categories JOIN FETCH a.address JOIN FETCH a.seller LEFT JOIN FETCH a.bids")
+    List<Auction> exportAuctions();
+
+
+//     LEFT JOIN FETCH a.bids as bds JOIN FETCH a.categories JOIN FETCH a.seller JOIN FETCH a.address LEFT join fetch bds.bidder as x LEFT join fetch x.address
 }

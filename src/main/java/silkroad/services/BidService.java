@@ -89,8 +89,7 @@ public class BidService {
         this.bidRepository.bid(auctionID, bid, amount, totalBids);
     }
 
-
-    public PageResponse<BidSellerDetails> getAuctionsBids(Authentication authentication, Long auctionID, Integer page, Integer size) {
+    public PageResponse<BidSellerDetails> getAuctionBids(Authentication authentication, Long auctionID, Integer page, Integer size) {
 
         if (!this.auctionRepository.existsById(auctionID))
             throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);

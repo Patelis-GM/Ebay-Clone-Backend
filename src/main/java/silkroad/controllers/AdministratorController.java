@@ -1,5 +1,6 @@
 package silkroad.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,11 @@ public class AdministratorController {
     }
 
     @RequestMapping(value = "/auctions/export", method = RequestMethod.GET)
-    public ResponseEntity<Void> exportAuctions(@RequestParam(name = "format") String format,
-                                               @RequestParam(name = "from") Long from,
-                                               @RequestParam(name = "to") Long to) {
+    public ResponseEntity<String> exportAuctions(@RequestParam(name = "format") String format,
+                                                 @RequestParam(name = "from") Long from,
+                                                 @RequestParam(name = "to") Long to) throws JsonProcessingException {
 
-        this.auctionService.exportAuctions(format,from,to);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(this.auctionService.exportAuctions(format, from, to), HttpStatus.OK);
     }
 
 

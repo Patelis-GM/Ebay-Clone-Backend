@@ -19,7 +19,7 @@ import java.util.*;
 @NamedQueries({
         @NamedQuery(name = "Auction.findAllByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id in :ids"),
         @NamedQuery(name = "Auction.findUserAuctionsByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.categories LEFT JOIN FETCH a.latestBid WHERE a.id in :ids"),
-        @NamedQuery(name = "Auction.findUserPurchasesByCriteria", query = "SELECT DISTINCT a FROM Auction a  JOIN FETCH a.images JOIN FETCH a.latestBid WHERE a.id in :ids")
+        @NamedQuery(name = "Auction.findUserPurchasesByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.images JOIN FETCH a.latestBid WHERE a.id in :ids")
 })
 public class Auction {
 
@@ -75,10 +75,10 @@ public class Auction {
     private User seller;
 
     @OneToMany(mappedBy = "auction")
-    List<Bid> bids = new ArrayList<>();
+    Set<Bid> bids = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bid_id", nullable = true)
+    @JoinColumn(name = "bid_id")
     private Bid latestBid;
 
     @Version
@@ -102,10 +102,8 @@ public class Auction {
     })
     private Address address;
 
-
     @ManyToMany(mappedBy = "searchHistory")
-    private Set<User> seenBy = new LinkedHashSet<>();
-
+    private Set<User> seenBy = new HashSet<>();
 
     @Override
     public int hashCode() {
