@@ -12,15 +12,15 @@ public interface BidMapper {
 
     @Mapping(target = "bidder", source = "bidder.username")
     @Mapping(target = "bidderRating", source = "bidder.buyerRating")
-    BidSellerDetails mapBidToBidSellerDetails(Bid bid);
+    BidSellerDetails toBidSellerDetails(Bid bid);
 
-    List<BidSellerDetails> mapBidsToBidSellerDetailsList(List<Bid> bids);
+    List<BidSellerDetails> toBidSellerDetailsList(List<Bid> bids);
 
     @Mapping(target = "auctionName", source = "bid.auction.name")
     @Mapping(target = "auctionID", source = "bid.auction.id")
-    BidBuyerDetails bidToBidBuyerDetails(Bid bid);
+    BidBuyerDetails toBidBuyerDetails(Bid bid);
 
-    List<BidBuyerDetails> mapBidsToBidBuyerDetailsList(List<Bid> bids);
+    List<BidBuyerDetails> toBidBuyerDetailsList(List<Bid> bids);
 
 
 }

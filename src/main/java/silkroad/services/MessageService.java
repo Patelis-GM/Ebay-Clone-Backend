@@ -72,14 +72,14 @@ public class MessageService {
     public PageResponse<ReceivedMessageDetails> getUserReceivedMessages(Authentication authentication, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Message_.CREATION_DATE).descending());
         Page<Message> messagePage = this.messageRepository.getReceivedMessages(authentication.getName(), pageRequest);
-        List<ReceivedMessageDetails> receivedMessageDetailsList = this.messageMapper.mapToReceivedMessageDetailsList(messagePage.getContent());
+        List<ReceivedMessageDetails> receivedMessageDetailsList = this.messageMapper.toReceivedMessageDetailsList(messagePage.getContent());
         return new PageResponse<>(receivedMessageDetailsList, page + 1, messagePage.getTotalPages(), messagePage.getTotalElements(), messagePage.getNumberOfElements());
     }
 
     public PageResponse<SentMessageDetails> getUserSentMessages(Authentication authentication, Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Message_.CREATION_DATE).descending());
         Page<Message> messagePage = this.messageRepository.getSentMessages(authentication.getName(), pageRequest);
-        List<SentMessageDetails> sentMessageDetailsList = this.messageMapper.mapToSentMessageDetailsList(messagePage.getContent());
+        List<SentMessageDetails> sentMessageDetailsList = this.messageMapper.toSentMessageDetailsList(messagePage.getContent());
         return new PageResponse<>(sentMessageDetailsList, page + 1, messagePage.getTotalPages(), messagePage.getTotalElements(), messagePage.getNumberOfElements());
     }
 

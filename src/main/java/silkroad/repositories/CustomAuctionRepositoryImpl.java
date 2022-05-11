@@ -15,9 +15,10 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.Date;
 import java.util.List;
 
-@Transactional
+@Transactional(readOnly = true)
 public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
 
     @PersistenceContext
@@ -83,6 +84,23 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
         return new PageImpl<>(auctions, pageRequest, count);
     }
 
+
+    public List<Auction> exportAuctions(Date from, Date to, Integer maxResults) {
+
+        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.categories JOIN FETCH a.address JOIN FETCH a.seller ORDER BY a.id ASC", Auction.class).
+                setMaxResults(maxResults).
+                setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
+//        typedQuery.setParameter("from", from);
+//        typedQuery.setParameter("to", to);
+        List<Auction> auctions = typedQuery.getResultList();
+
+        typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a LEFT JOIN FETCH a.bids AS bids LEFT JOIN FETCH bids.bidder AS bidder LEFT JOIN FETCH bidder.address WHERE a IN :auctions ORDER BY a.id ASC", Auction.class);
+        typedQuery.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
+        typedQuery.setParameter("auctions", auctions);
+        auctions = typedQuery.getResultList();
+
+        return auctions;
+    }
 
     private CriteriaQuery<Long> getIDQuery(CriteriaBuilder criteriaBuilder, Specification<Auction> specification) {
         CriteriaQuery<Long> idQuery = criteriaBuilder.createQuery(Long.class);

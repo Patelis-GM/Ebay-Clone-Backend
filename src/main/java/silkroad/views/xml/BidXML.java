@@ -18,6 +18,6 @@ public class BidXML implements Serializable {
     private final Date submissionDate;
 
     @JacksonXmlProperty(localName = "Amount")
-    private final Double amount;
+    private final String amount;
 
 }

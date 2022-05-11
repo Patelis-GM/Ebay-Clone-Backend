@@ -13,6 +13,23 @@ import java.util.List;
 @Data
 public class AuctionXML implements Serializable {
 
+    public AuctionXML(Long id, String name, List<CategoryXML> categories, String highestBid, String buyPrice, String firstBid, Long totalBids, List<BidXML> bids, AddressXML address, String country, Date startDate, Date endDate, SellerXML seller, String description) {
+        this.id = id;
+        this.name = name;
+        this.categories = categories;
+        this.buyPrice = buyPrice;
+        this.firstBid = firstBid;
+        this.totalBids = totalBids;
+        this.highestBid = (highestBid == null ? this.firstBid : highestBid);
+        this.bids = bids;
+        this.address = address;
+        this.country = country;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.seller = seller;
+        this.description = description;
+    }
+
     @JacksonXmlProperty(isAttribute = true, localName = "ItemID")
     private final Long id;
 
@@ -24,14 +41,14 @@ public class AuctionXML implements Serializable {
     private final List<CategoryXML> categories;
 
     @JacksonXmlProperty(localName = "Currently")
-    private final Double highestBid;
+    private final String highestBid;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JacksonXmlProperty(localName = "Buy_Price")
-    private final Double buyPrice;
+    private final String buyPrice;
 
     @JacksonXmlProperty(localName = "First_Bid")
-    private final Double firstBid;
+    private final String firstBid;
 
     @JacksonXmlProperty(localName = "Number_of_Bids")
     private final Long totalBids;
@@ -59,4 +76,5 @@ public class AuctionXML implements Serializable {
 
     @JacksonXmlProperty(localName = "Description")
     private final String description;
+
 }

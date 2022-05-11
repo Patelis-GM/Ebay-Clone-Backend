@@ -101,7 +101,7 @@ public class BidService {
 
         Page<Bid> bidsPage = this.bidRepository.findByAuctionId(auctionID, pageRequest);
 
-        List<BidSellerDetails> auctionBids = this.bidMapper.mapBidsToBidSellerDetailsList(bidsPage.getContent());
+        List<BidSellerDetails> auctionBids = this.bidMapper.toBidSellerDetailsList(bidsPage.getContent());
 
         return new PageResponse<>(auctionBids, bidsPage.getNumber() + 1, bidsPage.getTotalPages(), bidsPage.getTotalElements(), bidsPage.getNumberOfElements());
     }
@@ -112,7 +112,7 @@ public class BidService {
 
         Page<Bid> bidsPage = this.bidRepository.findByUserId(authentication.getName(), pageRequest);
 
-        List<BidBuyerDetails> userBids = this.bidMapper.mapBidsToBidBuyerDetailsList(bidsPage.getContent());
+        List<BidBuyerDetails> userBids = this.bidMapper.toBidBuyerDetailsList(bidsPage.getContent());
 
         return new PageResponse<>(userBids, bidsPage.getNumber() + 1, bidsPage.getTotalPages(), bidsPage.getTotalElements(), bidsPage.getNumberOfElements());
     }

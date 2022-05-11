@@ -12,15 +12,14 @@ public interface MessageMapper {
 
     @Mapping(target = "sender", source = "sender.username")
     @Mapping(target = "recipient", source = "recipient.username")
-    ReceivedMessageDetails mapToReceivedMessageDetails(Message message);
+    ReceivedMessageDetails toReceivedMessageDetails(Message message);
 
-    List<ReceivedMessageDetails> mapToReceivedMessageDetailsList(List<Message> messages);
+    List<ReceivedMessageDetails> toReceivedMessageDetailsList(List<Message> messages);
 
     @Mapping(target = "sender", source = "sender.username")
     @Mapping(target = "recipient", source = "recipient.username")
-    SentMessageDetails mapToSentMessageDetails(Message message);
+    SentMessageDetails toSentMessageDetails(Message message);
 
-    List<SentMessageDetails> mapToSentMessageDetailsList(List<Message> messages);
-
+    List<SentMessageDetails> toSentMessageDetailsList(List<Message> messages);
 
 }

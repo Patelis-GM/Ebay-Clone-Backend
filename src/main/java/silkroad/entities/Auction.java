@@ -75,11 +75,21 @@ public class Auction {
     private User seller;
 
     @OneToMany(mappedBy = "auction")
-    Set<Bid> bids = new HashSet<>();
+    List<Bid> bids = new ArrayList<>();
+
+    @OneToMany(mappedBy = "auction")
+    private List<Image> images = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bid_id")
     private Bid latestBid;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumns({
+            @JoinColumn(name = "latitude", referencedColumnName = "latitude", nullable = false),
+            @JoinColumn(name = "longitude", referencedColumnName = "longitude", nullable = false)
+    })
+    private Address address;
 
     @Version
     @Column(name = "version")
@@ -92,15 +102,6 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     Set<Category> categories = new HashSet<>();
 
-    @OneToMany(mappedBy = "auction")
-    private Set<Image> images = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumns({
-            @JoinColumn(name = "latitude", referencedColumnName = "latitude", nullable = false),
-            @JoinColumn(name = "longitude", referencedColumnName = "longitude", nullable = false)
-    })
-    private Address address;
 
     @ManyToMany(mappedBy = "searchHistory")
     private Set<User> seenBy = new HashSet<>();

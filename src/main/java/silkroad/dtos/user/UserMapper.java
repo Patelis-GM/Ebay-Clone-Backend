@@ -1,7 +1,6 @@
 package silkroad.dtos.user;
 
 import org.mapstruct.*;
-import org.springframework.data.domain.Page;
 import silkroad.dtos.user.response.UserBasicDetails;
 import silkroad.dtos.user.response.UserCompleteDetails;
 import silkroad.entities.User;
@@ -12,11 +11,11 @@ import java.util.List;
 public interface UserMapper {
 
     @Mapping(source = "role.name", target = "role")
-    UserCompleteDetails mapToUserCompleteDetails(User user);
+    UserCompleteDetails toUserCompleteDetails(User user);
 
     @Mapping(source = "role.name", target = "role")
-    UserBasicDetails mapToUserBasicDetails(User user);
+    UserBasicDetails toUserBasicDetails(User user);
 
-    List<UserBasicDetails> mapToUsersBasicDetails(List<User> users);
+    List<UserBasicDetails> toUserBasicDetailsList(List<User> users);
 
 }

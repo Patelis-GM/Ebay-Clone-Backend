@@ -68,12 +68,6 @@ public class AuctionSpecificationBuilder {
         return criteriaBuilder.greaterThan(root.get(Auction_.END_DATE), TimeManager.now());
     }
 
-    public static Predicate wasPostedInPeriod(Root<Auction> root, CriteriaBuilder criteriaBuilder, Long from, Long to) {
-        Predicate startedFrom = criteriaBuilder.greaterThanOrEqualTo(root.get(Auction_.START_DATE), TimeManager.toDate(from));
-        Predicate startedTo = criteriaBuilder.lessThanOrEqualTo(root.get(Auction_.START_DATE), TimeManager.toDate(to));
-        return criteriaBuilder.and(startedFrom, startedTo);
-    }
-
     public static Specification<Auction> getAuctionsBrowsingSpecification(String textSearch, Double minimumPrice, Double maximumPrice, String category, String location, Boolean hasBuyPrice) {
 
         return (root, query, criteriaBuilder) -> {
@@ -93,7 +87,7 @@ public class AuctionSpecificationBuilder {
 
             if (location != null) {
                 Join<Auction, Address> addressJoin = root.join(Auction_.ADDRESS, JoinType.INNER);
-                addressJoin.on(criteriaBuilder.equal(addressJoin.get(Address_.COUNTRY), location));
+                addressJoin.on(criteriaBuilder.or(criteriaBuilder.like(addressJoin.get(Address_.COUNTRY), location + "%"), criteriaBuilder.like(addressJoin.get(Address_.LOCATION), location + "%")));
             }
 
             if (textSearch != null) {
@@ -162,19 +156,5 @@ public class AuctionSpecificationBuilder {
         };
 
     }
-
-    public static Specification<Auction> geExportAuctionsSpecification(Long from, Long to) {
-
-        return (root, query, criteriaBuilder) -> {
-
-            List<Predicate> auctionPredicates = new ArrayList<>();
-
-            auctionPredicates.add(AuctionSpecificationBuilder.wasPostedInPeriod(root, criteriaBuilder, from, to));
-
-            return criteriaBuilder.and(auctionPredicates.toArray(new Predicate[0]));
-        };
-
-    }
-
 
 }

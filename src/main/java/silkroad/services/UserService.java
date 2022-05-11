@@ -95,7 +95,7 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = this.userRepository.findWithAddressByUsername(username);
 
         if (optionalUser.isPresent())
-            return this.userMapper.mapToUserCompleteDetails(optionalUser.get());
+            return this.userMapper.toUserCompleteDetails(optionalUser.get());
 
         else
             throw new UserException(username, UserException.NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -109,6 +109,6 @@ public class UserService implements UserDetailsService {
 
         PageRequest pageRequest = PageRequest.of(pageIndex, pageSize);
         Page<User> userPage = this.userRepository.findAll(userSpecification, pageRequest);
-        return new PageResponse<>(this.userMapper.mapToUsersBasicDetails(userPage.getContent()), userPage.getNumber() + 1, userPage.getTotalPages(), userPage.getTotalElements(), userPage.getNumberOfElements());
+        return new PageResponse<>(this.userMapper.toUserBasicDetailsList(userPage.getContent()), userPage.getNumber() + 1, userPage.getTotalPages(), userPage.getTotalElements(), userPage.getNumberOfElements());
     }
 }

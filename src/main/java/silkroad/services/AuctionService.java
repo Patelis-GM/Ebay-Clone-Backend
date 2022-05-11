@@ -131,7 +131,7 @@ public class AuctionService {
             this.searchHistoryRepository.save(searchHistoryRecord);
         }
 
-        return this.auctionMapper.mapToAuctionBrowsingCompleteDetails(auction);
+        return this.auctionMapper.toAuctionBrowsingCompleteDetails(auction);
     }
 
 
@@ -143,7 +143,7 @@ public class AuctionService {
 
         Page<Auction> auctionPage = this.auctionRepository.browseAuctions(auctionSpecification, pageRequest);
 
-        List<AuctionBrowsingBasicDetails> auctionBrowsingBasicDetailsList = this.auctionMapper.mapToAuctionBrowsingBasicDetailsList(auctionPage.getContent());
+        List<AuctionBrowsingBasicDetails> auctionBrowsingBasicDetailsList = this.auctionMapper.toAuctionBrowsingBasicDetailsList(auctionPage.getContent());
 
         return new PageResponse<>(auctionBrowsingBasicDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
 
@@ -159,7 +159,7 @@ public class AuctionService {
 
         Page<Auction> auctionPage = this.auctionRepository.getUserAuctions(auctionSpecification, pageRequest);
 
-        List<AuctionCompleteDetails> auctionBasicDetailsList = this.auctionMapper.mapToAuctionCompleteDetailsDetailsList(auctionPage.getContent());
+        List<AuctionCompleteDetails> auctionBasicDetailsList = this.auctionMapper.toAuctionCompleteDetailsDetailsList(auctionPage.getContent());
 
         return new PageResponse<>(auctionBasicDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
     }
@@ -174,7 +174,7 @@ public class AuctionService {
 
         Page<Auction> auctionPage = this.auctionRepository.getUserPurchases(auctionSpecification, pageRequest);
 
-        List<AuctionPurchaseDetails> auctionPurchaseDetailsList = this.auctionMapper.mapToAuctionPurchaseDetailsList(auctionPage.getContent());
+        List<AuctionPurchaseDetails> auctionPurchaseDetailsList = this.auctionMapper.toAuctionPurchaseDetailsList(auctionPage.getContent());
 
         return new PageResponse<>(auctionPurchaseDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
 
@@ -188,10 +188,10 @@ public class AuctionService {
         xmlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
 
-        List<Auction> auctions = this.auctionRepository.exportAuctions();
+        List<Auction> auctions = this.auctionRepository.exportAuctions(new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()), 500);
         System.out.println(auctions.size());
 
-        AuctionXMLCollection auctionXMLCollection = new AuctionXMLCollection(xmlExportMapper.map(auctions));
+        AuctionXMLCollection auctionXMLCollection = new AuctionXMLCollection(xmlExportMapper.toAuctionXMLList(auctions));
         return xmlMapper.writeValueAsString(auctionXMLCollection);
     }
 }
