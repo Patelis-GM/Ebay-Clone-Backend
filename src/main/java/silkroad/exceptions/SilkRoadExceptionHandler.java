@@ -14,9 +14,5 @@ public class SilkRoadExceptionHandler {
         return new ResponseEntity<>(new SilkRoadExceptionDTO(exception), exception.getHttpStatus());
     }
 
-//    @ExceptionHandler(value = CannotAcquireLockException.class)
-//    public ResponseEntity<SilkRoadExceptionDTO> handleInvalidInputExceptio(CannotAcquireLockException exception) {
-//        return new ResponseEntity<>(new SilkRoadExceptionDTO(exception, HttpStatus.OK), HttpStatus.OK);
-//    }
 
 }

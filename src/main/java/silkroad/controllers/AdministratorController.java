@@ -2,8 +2,10 @@ package silkroad.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.boot.web.servlet.server.Encoding;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import silkroad.dtos.page.PageResponse;
 import silkroad.dtos.user.response.UserBasicDetails;
@@ -11,6 +13,14 @@ import silkroad.dtos.user.response.UserCompleteDetails;
 import silkroad.entities.Auction;
 import silkroad.services.AuctionService;
 import silkroad.services.UserService;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
 @AllArgsConstructor
 @RestController
@@ -38,11 +48,34 @@ public class AdministratorController {
     }
 
     @RequestMapping(value = "/auctions/export", method = RequestMethod.GET)
-    public ResponseEntity<String> exportAuctions(@RequestParam(name = "format") String format,
-                                                 @RequestParam(name = "from") Long from,
-                                                 @RequestParam(name = "to") Long to) throws JsonProcessingException {
+    public ResponseEntity<InputStreamResource> exportAuctions(@RequestParam(name = "format") String format,
+                                                              @RequestParam(name = "from") Long from,
+                                                              @RequestParam(name = "to") Long to) throws IOException {
 
-        return new ResponseEntity<>(this.auctionService.exportAuctions(format, from, to), HttpStatus.OK);
+        String xmlString = this.auctionService.exportAuctions(format, from, to);
+//        byte[] xmlStringByteArray = xmlString.getBytes();
+//        response.setCharacterEncoding("UTF-8");
+//        response.setHeader("Content-Transfer-Encoding", "binary");
+//        response.setContentType(APPLICATION_XML_VALUE);
+//        response.setContentLength(xmlString.length());
+//        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Auctions.xml");
+
+
+        InputStream stringInputStream = new ByteArrayInputStream(xmlString.getBytes());
+        InputStreamResource inputStreamResource = new InputStreamResource(stringInputStream);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_XML);
+        httpHeaders.setContentDispositionFormData("attachment", "ExportAuctions.xml");
+
+        //this copies the content of your string to the output stream
+//        IOUtils.copy(stringInputStream, response.getOutputStream());
+//
+//
+//        response.flushBuffer();
+
+        return new ResponseEntity<>(inputStreamResource, httpHeaders, HttpStatus.OK);
+//        return new ResponseEntity<>(this.auctionService.exportAuctions(format, from, to), HttpStatus.OK);
     }
 
 

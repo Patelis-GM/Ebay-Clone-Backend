@@ -23,8 +23,6 @@ import silkroad.entities.Role;
 import silkroad.entities.Roles;
 import silkroad.entities.User;
 import silkroad.entities.User_;
-import silkroad.exceptions.LoginException;
-import silkroad.exceptions.SignUpException;
 import silkroad.exceptions.UserException;
 import silkroad.repositories.UserRepository;
 import silkroad.security.UserInformation;
@@ -48,7 +46,7 @@ public class UserService implements UserDetailsService {
         Optional<UserSecurityDetails> user = this.userRepository.findByUsername(username);
 
         if (user.isEmpty())
-            throw new LoginException(username, LoginException.LOGIN_USER_NOT_FOUND);
+            throw new UsernameNotFoundException(username);
 
         ArrayList<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
@@ -65,10 +63,10 @@ public class UserService implements UserDetailsService {
     public void signUpUser(UserRegistration user) {
 
         if (this.userRepository.existsByUsername(user.getUsername()))
-            throw new SignUpException(user.getUsername(), SignUpException.SIGNUP_USERNAME_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new UserException(user.getUsername(), UserException.USERNAME_EXISTS, HttpStatus.BAD_REQUEST);
 
         if (this.userRepository.existsByEmail(user.getEmail()))
-            throw new SignUpException(user.getEmail(), SignUpException.SIGNUP_EMAIL_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new UserException(user.getEmail(), UserException.EMAIL_EXISTS, HttpStatus.BAD_REQUEST);
 
 
         User newUser = new User(user.getUsername(),

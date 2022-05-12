@@ -94,6 +94,8 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
 //        typedQuery.setParameter("to", to);
         List<Auction> auctions = typedQuery.getResultList();
 
+        System.out.println(auctions.size());
+
         typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a LEFT JOIN FETCH a.bids AS bids LEFT JOIN FETCH bids.bidder AS bidder LEFT JOIN FETCH bidder.address WHERE a IN :auctions ORDER BY a.id ASC", Auction.class);
         typedQuery.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
         typedQuery.setParameter("auctions", auctions);

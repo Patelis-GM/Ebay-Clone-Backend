@@ -189,7 +189,6 @@ public class AuctionService {
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
 
         List<Auction> auctions = this.auctionRepository.exportAuctions(new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()), 500);
-        System.out.println(auctions.size());
 
         AuctionXMLCollection auctionXMLCollection = new AuctionXMLCollection(xmlExportMapper.toAuctionXMLList(auctions));
         return xmlMapper.writeValueAsString(auctionXMLCollection);
