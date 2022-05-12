@@ -1,6 +1,5 @@
 package silkroad.dtos.user.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import silkroad.entities.Address;
 
@@ -20,6 +19,5 @@ public class UserCompleteDetails implements Serializable {
     private final Double buyerRating;
     private final Double sellerRating;
     private final Address address;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final Date joinDate;
 }

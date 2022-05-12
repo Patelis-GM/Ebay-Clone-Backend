@@ -17,6 +17,5 @@ public class BidSellerDetails implements Serializable {
 
     private final Double amount;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final Date submissionDate;
 }

@@ -1,6 +1,5 @@
 package silkroad.dtos.auction.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import silkroad.entities.Address;
 import silkroad.utilities.TimeManager;
@@ -12,14 +11,11 @@ import java.util.Set;
 
 @Data
 public class AuctionCompleteDetails implements Serializable {
+
     private final Long id;
     private final String name;
     private final String description;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final Date startDate;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final Date endDate;
     private final Double buyPrice;
     private final Double firstBid;

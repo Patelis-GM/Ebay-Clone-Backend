@@ -9,11 +9,18 @@ import java.io.Serializable;
 public class UserRegistration implements Serializable {
 
     private String username;
+
     private String password;
+
     private String email;
+
     private String firstName;
+
     private String lastName;
+
     private String phone;
+
     private String tin;
+
     private Address address;
 }
