@@ -66,7 +66,7 @@ public class UserController {
         return new ResponseEntity<>(this.bidService.getUserBids(authentication, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
-
+    /* Send Message */
     @RequestMapping(value = "/users/{username}/messages", method = RequestMethod.POST)
     public ResponseEntity<Void> sendMessage(Authentication authentication,
                                             @PathVariable String username,
@@ -76,6 +76,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    /* Inbox - Outbox */
     @RequestMapping(value = "/users/{username}/messages", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<?>> getUserMessages(Authentication authentication,
                                                            @PathVariable String username,
@@ -89,6 +90,7 @@ public class UserController {
             return new ResponseEntity<>(this.messageService.getUserReceivedMessages(authentication, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
+    /* Delete Message Access */
     @RequestMapping(value = "/users/{username}/messages/{messageID}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUserMessage(Authentication authentication,
                                                   @PathVariable String username,
@@ -98,6 +100,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /* Read Message */
     @RequestMapping(value = "/users/{username}/messages/{messageID}", method = RequestMethod.PUT)
     public ResponseEntity<Void> readUserMessage(Authentication authentication,
                                                 @PathVariable String username,

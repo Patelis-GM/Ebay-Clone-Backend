@@ -10,7 +10,7 @@ public class UserException extends SilkRoadException {
     public static final String USER_USERNAME_EXISTS = "UE_003";
     public static final String USER_EMAIL_EXISTS = "UE_004";
     public static final String USER_BAD_CREDENTIALS = "UE_005";
-    public static final String USER_DISABLED = "UE_006";
+    public static final String USER_NOT_APPROVED = "UE_006";
 
     public UserException(String message, String code, HttpStatus httpStatus) {
         super(message, code, httpStatus);

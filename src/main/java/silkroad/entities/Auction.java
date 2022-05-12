@@ -103,9 +103,6 @@ public class Auction {
     Set<Category> categories = new HashSet<>();
 
 
-    @ManyToMany(mappedBy = "searchHistory")
-    private Set<User> seenBy = new HashSet<>();
-
     @Override
     public int hashCode() {
         return getClass().hashCode();

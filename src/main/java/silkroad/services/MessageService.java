@@ -17,6 +17,7 @@ import silkroad.entities.Message;
 import silkroad.entities.Message_;
 import silkroad.entities.User;
 import silkroad.exceptions.MessageException;
+import silkroad.exceptions.UserException;
 import silkroad.repositories.MessageRepository;
 import silkroad.repositories.UserRepository;
 
@@ -34,6 +35,9 @@ public class MessageService {
     public void sendMessage(Authentication authentication, MessagePosting messagePosting) {
 
         String recipientUsername = messagePosting.getRecipient();
+
+        if (!this.userRepository.existsById(recipientUsername))
+            throw new UserException(UserException.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         User sender = this.userRepository.getById(authentication.getName());
         User recipient = this.userRepository.getById(recipientUsername);
@@ -53,6 +57,9 @@ public class MessageService {
 
         if (!this.messageRepository.existsById(messageID))
             throw new MessageException(MessageException.NOT_FOUND, HttpStatus.NOT_FOUND);
+
+        if (!this.messageRepository.findRecipientById(messageID).equals(authentication.getName()))
+            throw new UserException(UserException.USER_ACTION_FORBIDDEN, HttpStatus.FORBIDDEN);
 
         this.messageRepository.readMessage(messageID, authentication.getName(), true);
     }

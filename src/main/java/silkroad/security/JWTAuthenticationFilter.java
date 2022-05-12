@@ -58,7 +58,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         UserException userException;
         if (authenticationException instanceof DisabledException)
-            userException = new UserException(UserException.USER_DISABLED, HttpStatus.UNAUTHORIZED);
+            userException = new UserException(UserException.USER_NOT_APPROVED, HttpStatus.UNAUTHORIZED);
         else if (authenticationException instanceof BadCredentialsException)
             userException = new UserException(UserException.USER_BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
         else {
