@@ -30,23 +30,26 @@ public class AdministratorController {
     private final UserService userService;
     private final AuctionService auctionService;
 
-
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<UserBasicDetails>> getUsers(@RequestParam(name = "approved", required = false) Boolean approvalStatus, @RequestParam(name = "page") Integer pageIndex, @RequestParam(name = "size") Integer pageSize) {
         return new ResponseEntity<>(this.userService.getUsersBasicDetails(approvalStatus, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}", method = RequestMethod.GET)
     public ResponseEntity<UserCompleteDetails> getUser(@PathVariable String username) {
         return new ResponseEntity<>(this.userService.getUser(username), HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}", method = RequestMethod.PUT)
     public ResponseEntity<Void> approveUser(@PathVariable String username) {
         this.userService.approveUser(username);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/export", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> exportAuctions(@RequestParam(name = "format") String format,
                                                               @RequestParam(name = "from") Long from,

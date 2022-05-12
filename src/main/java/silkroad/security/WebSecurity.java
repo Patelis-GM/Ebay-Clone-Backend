@@ -12,6 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import silkroad.entities.Roles;
 import silkroad.services.UserService;
@@ -26,9 +29,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
+        http.cors().disable();
         http.csrf().disable();
-
         http.authorizeRequests()
                 .antMatchers("/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/users").permitAll()
@@ -59,13 +61,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public CommonsRequestLoggingFilter requestLoggingFilter() {
-        CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
-        loggingFilter.setIncludeClientInfo(true);
-        loggingFilter.setIncludeQueryString(true);
-        loggingFilter.setIncludePayload(true);
-        loggingFilter.setMaxPayloadLength(64000);
-        return loggingFilter;
+    CorsConfigurationSource corsConfigurationSource() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.applyPermitDefaultValues();
+        config.addExposedHeader("Authorization");
+        config.setAllowCredentials(true);
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
 

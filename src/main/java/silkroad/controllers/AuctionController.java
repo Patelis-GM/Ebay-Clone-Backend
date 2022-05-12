@@ -27,6 +27,7 @@ public class AuctionController {
     private final BidService bidService;
 
     /* Create Auction */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions", method = RequestMethod.POST)
     public ResponseEntity<Void> createAuction(Authentication authentication, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
@@ -36,6 +37,7 @@ public class AuctionController {
     }
 
     /* Update Auction */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}", method = RequestMethod.PUT)
     public ResponseEntity<Void> updateAuction(Authentication authentication, @PathVariable Long auctionID, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
@@ -45,6 +47,7 @@ public class AuctionController {
     }
 
     /* Delete Auction */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteAuction(Authentication authentication, @PathVariable Long auctionID) {
         this.auctionService.deleteAuction(authentication, auctionID);
@@ -52,12 +55,14 @@ public class AuctionController {
     }
 
     /* Get Auction */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}", method = RequestMethod.GET)
     public ResponseEntity<AuctionBrowsingCompleteDetails> getAuction(Authentication authentication, @PathVariable Long auctionID) {
         return new ResponseEntity<>(this.auctionService.getAuction(authentication, auctionID), HttpStatus.OK);
     }
 
     /* Browse Auctions */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<AuctionBrowsingBasicDetails>> browseAuctions(@RequestParam(name = "query", required = false) String textSearch,
                                                                                     @RequestParam(name = "min-price", required = false) Double minPrice,
@@ -73,6 +78,7 @@ public class AuctionController {
 
 
     /* Bid on Auction */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}/bid", method = RequestMethod.POST)
     public ResponseEntity<Void> bid(Authentication authentication, @PathVariable Long auctionID, @RequestBody BidPosting bidPosting) {
         this.bidService.bid(authentication, auctionID, bidPosting.getAmount(), bidPosting.getVersion());
@@ -80,6 +86,7 @@ public class AuctionController {
     }
 
     /* Get Auction Bids */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}/bid", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<BidSellerDetails>> getAuctionBids(Authentication authentication,
                                                                   @PathVariable Long auctionID,

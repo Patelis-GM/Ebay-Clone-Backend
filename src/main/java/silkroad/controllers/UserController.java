@@ -28,6 +28,7 @@ public class UserController {
 
 
     /* Create User */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public ResponseEntity<Void> signUp(@RequestBody UserRegistration user) {
         Address address = this.addressService.createOrFindAddress(user.getAddress());
@@ -36,6 +37,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/auctions", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<AuctionCompleteDetails>> getUserPostedAuctions(Authentication authentication,
                                                                                       @PathVariable String username,
@@ -47,6 +49,7 @@ public class UserController {
         return new ResponseEntity<>(this.auctionService.getUserPostedAuctions(authentication, pageIndex - 1, pageSize, active, sold), HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/purchases", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<AuctionPurchaseDetails>> getUserPurchasedAuctions(Authentication authentication,
                                                                                          @PathVariable String username,
@@ -56,7 +59,7 @@ public class UserController {
         return new ResponseEntity<>(this.auctionService.getUserPurchasedAuctions(authentication, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 
-
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/bids", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<BidBuyerDetails>> getUserBids(Authentication authentication,
                                                                      @PathVariable String username,
@@ -67,6 +70,7 @@ public class UserController {
     }
 
     /* Send Message */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/messages", method = RequestMethod.POST)
     public ResponseEntity<Void> sendMessage(Authentication authentication,
                                             @PathVariable String username,
@@ -77,6 +81,7 @@ public class UserController {
     }
 
     /* Inbox - Outbox */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/messages", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<?>> getUserMessages(Authentication authentication,
                                                            @PathVariable String username,
@@ -91,6 +96,7 @@ public class UserController {
     }
 
     /* Delete Message Access */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/messages/{messageID}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUserMessage(Authentication authentication,
                                                   @PathVariable String username,
@@ -101,6 +107,7 @@ public class UserController {
     }
 
     /* Read Message */
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/messages/{messageID}", method = RequestMethod.PUT)
     public ResponseEntity<Void> readUserMessage(Authentication authentication,
                                                 @PathVariable String username,
