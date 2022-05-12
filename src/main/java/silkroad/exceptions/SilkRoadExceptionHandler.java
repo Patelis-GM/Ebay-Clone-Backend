@@ -1,7 +1,5 @@
 package silkroad.exceptions;
 
-import org.springframework.dao.CannotAcquireLockException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,9 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class SilkRoadExceptionHandler {
 
     @ExceptionHandler(value = SilkRoadException.class)
-    public ResponseEntity<SilkRoadExceptionDTO> handleInvalidInputException(SilkRoadException exception) {
-        return new ResponseEntity<>(new SilkRoadExceptionDTO(exception), exception.getHttpStatus());
+    public ResponseEntity<SilkRoadExceptionDetails> handleInvalidInputException(SilkRoadException exception) {
+        return new ResponseEntity<>(new SilkRoadExceptionDetails(exception), exception.getHttpStatus());
     }
-
 
 }

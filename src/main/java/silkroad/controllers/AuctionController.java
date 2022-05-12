@@ -57,7 +57,7 @@ public class AuctionController {
         return new ResponseEntity<>(this.auctionService.getAuction(authentication, auctionID), HttpStatus.OK);
     }
 
-    /* Get Auctions */
+    /* Browse Auctions */
     @RequestMapping(value = "/auctions", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<AuctionBrowsingBasicDetails>> browseAuctions(@RequestParam(name = "query", required = false) String textSearch,
                                                                                     @RequestParam(name = "min-price", required = false) Double minPrice,

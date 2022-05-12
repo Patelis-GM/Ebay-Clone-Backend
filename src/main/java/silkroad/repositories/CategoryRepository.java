@@ -10,6 +10,6 @@ import java.util.Set;
 
 public interface CategoryRepository extends JpaRepository<Category, String> {
 
-    @Query("SELECT c FROM Category c where c.name in ?1")
+    @Query("SELECT DISTINCT c FROM Category c where c.name in ?1")
     Set<Category> findAllDistinct(List<String> categories);
 }

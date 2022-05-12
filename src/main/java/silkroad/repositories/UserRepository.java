@@ -4,12 +4,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import silkroad.dtos.user.request.UserSecurityDetails;
 import silkroad.entities.User;
 
 import java.util.Optional;
 
+@Repository
 public interface UserRepository extends JpaRepository<User, String>, JpaSpecificationExecutor<User> {
 
     @Query("SELECT new silkroad.dtos.user.request.UserSecurityDetails(u.username, u.password, u.approved, u.role.name) FROM User u WHERE u.username = ?1")

@@ -22,7 +22,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ImageService {
 
-    private final String uploadsDirectory = "C:\\Users\\PLAISIO\\Desktop\\Web-Applications\\Uploads\\";
+    private final String uploadsDirectory = "C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/";
     private final ImageRepository imageRepository;
 
     @Transactional
@@ -33,7 +33,7 @@ public class ImageService {
         if (!uploadsDirectory.exists())
             uploadsDirectory.mkdir();
 
-        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "\\");
+        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "/");
 
         if (!auctionDirectory.exists())
             auctionDirectory.mkdir();
@@ -43,7 +43,7 @@ public class ImageService {
         for (MultipartFile multipartFile : multipartFiles) {
 
             String fileName = multipartFile.getOriginalFilename();
-            String filePath = this.uploadsDirectory + auction.getId() + "\\" + fileName;
+            String filePath = this.uploadsDirectory + auction.getId() + "/" + fileName;
 
             File file = new File(filePath);
 
@@ -72,7 +72,7 @@ public class ImageService {
     @Transactional
     public void updateImages(Auction auction, MultipartFile[] multipartFiles) {
 
-        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "\\");
+        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "/");
 
         for (File file : Objects.requireNonNull(auctionDirectory.listFiles()))
             file.delete();
@@ -83,14 +83,14 @@ public class ImageService {
     }
 
     @Transactional
-    public void deleteImages(Long auctionID, boolean databaseOnly) {
+    public void deleteImages(Long auctionID, boolean inDatabase) {
 
-        if (databaseOnly)
+        if (inDatabase)
             this.imageRepository.deleteByAuction(auctionID);
 
         else {
 
-            File auctionDirectory = new File(this.uploadsDirectory + auctionID + "\\");
+            File auctionDirectory = new File(this.uploadsDirectory + auctionID + "/");
 
             try {
                 FileUtils.deleteDirectory(auctionDirectory);

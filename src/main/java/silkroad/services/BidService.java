@@ -15,6 +15,7 @@ import silkroad.dtos.page.PageResponse;
 import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
 import silkroad.exceptions.BidException;
+import silkroad.exceptions.UserException;
 import silkroad.repositories.AuctionRepository;
 import silkroad.repositories.BidRepository;
 import silkroad.repositories.SearchHistoryRepository;
@@ -40,29 +41,29 @@ public class BidService {
     public void bid(Authentication authentication, Long auctionID, Double amount, Long version) {
 
         if (!this.auctionRepository.existsById(auctionID))
-            throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         Date bidDate = TimeManager.now();
 
         Optional<Auction> optionalAuction = this.auctionRepository.findBiddableById(auctionID, bidDate, version);
 
         if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.MODIFIED_OR_EXPIRED, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_MODIFIED_OR_EXPIRED, HttpStatus.BAD_REQUEST);
 
         Auction auction = optionalAuction.get();
 
         if (auction.getSeller().getUsername().equals(authentication.getName()))
-            throw new BidException(BidException.BIDDER_BAD_CREDENTIALS, HttpStatus.BAD_REQUEST);
+            throw new UserException(UserException.USER_ACTION_FORBIDDEN, HttpStatus.FORBIDDEN);
 
         Double auctionFirstBid = auction.getFirstBid();
         Double auctionHighestBid = auction.getHighestBid();
         Long totalBids = auction.getTotalBids();
 
         if (amount <= 0 || amount < auctionFirstBid)
-            throw new BidException(BidException.INVALID_BID_AMOUNT, HttpStatus.BAD_REQUEST);
+            throw new BidException(BidException.BID_INVALID_AMOUNT, HttpStatus.BAD_REQUEST);
 
         if (amount <= auctionHighestBid)
-            throw new BidException(BidException.HIGHER_BID_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new BidException(BidException.BID_HIGHER_BID_EXISTS, HttpStatus.BAD_REQUEST);
 
         User bidder = this.userRepository.getById(authentication.getName());
 
@@ -92,10 +93,10 @@ public class BidService {
     public PageResponse<BidSellerDetails> getAuctionBids(Authentication authentication, Long auctionID, Integer page, Integer size) {
 
         if (!this.auctionRepository.existsById(auctionID))
-            throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         if (!this.auctionRepository.findAuctionSellerById(auctionID).equals(authentication.getName()))
-            throw new AuctionException(AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+            throw new UserException(UserException.USER_ACTION_FORBIDDEN, HttpStatus.FORBIDDEN);
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Bid_.SUBMISSION_DATE).descending());
 

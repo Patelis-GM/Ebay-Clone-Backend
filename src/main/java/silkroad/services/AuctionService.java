@@ -23,6 +23,7 @@ import silkroad.dtos.auction.response.AuctionPurchaseDetails;
 import silkroad.dtos.page.PageResponse;
 import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
+import silkroad.exceptions.UserException;
 import silkroad.repositories.*;
 import silkroad.specifications.AuctionSpecificationBuilder;
 import silkroad.views.xml.AuctionXMLCollection;
@@ -48,7 +49,7 @@ public class AuctionService {
         Set<Category> auctionCategories = this.categoryRepository.findAllDistinct(auctionDTO.getCategories());
 
         if (auctionCategories.size() != auctionDTO.getCategories().size())
-            throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.AUCTION_INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
 
         String username = authentication.getName();
         User seller = new User(username);
@@ -68,15 +69,15 @@ public class AuctionService {
     public void updateAuction(Authentication authentication, Long auctionID, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
         if (!this.auctionRepository.existsById(auctionID))
-            throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         if (!this.auctionRepository.findAuctionSellerById(auctionID).equals(authentication.getName()))
-            throw new AuctionException(auctionID.toString(), AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+            throw new UserException(UserException.USER_ACTION_FORBIDDEN, HttpStatus.FORBIDDEN);
 
         Optional<Auction> optionalAuction = this.auctionRepository.findUpdatableById(auctionID);
 
         if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.HAS_BID, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_HAS_BID, HttpStatus.BAD_REQUEST);
 
         Auction auction = optionalAuction.get();
 
@@ -84,7 +85,7 @@ public class AuctionService {
 
 
         if (auctionCategories.size() != auctionDTO.getCategories().size())
-            throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.AUCTION_INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
 
         auction.setAddress(auctionDTO.getAddress());
         auction.setName(auctionDTO.getName());
@@ -101,17 +102,17 @@ public class AuctionService {
     public void deleteAuction(Authentication authentication, Long auctionID) {
 
         if (!this.auctionRepository.existsById(auctionID))
-            throw new AuctionException(AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         if (!this.auctionRepository.findAuctionSellerById(auctionID).equals(authentication.getName()))
-            throw new AuctionException(auctionID.toString(), AuctionException.SELLER_BAD_CREDENTIALS, HttpStatus.FORBIDDEN);
+            throw new UserException(UserException.USER_ACTION_FORBIDDEN, HttpStatus.FORBIDDEN);
 
         this.imageService.deleteImages(auctionID, true);
 
         this.searchHistoryRepository.deleteByAuctionId(auctionID);
 
         if (this.auctionRepository.removeById(auctionID) == 0)
-            throw new AuctionException(auctionID.toString(), AuctionException.HAS_BID, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_HAS_BID, HttpStatus.BAD_REQUEST);
 
         this.imageService.deleteImages(auctionID, false);
     }
@@ -122,7 +123,7 @@ public class AuctionService {
         Optional<Auction> optionalAuction = this.auctionRepository.fetchAuctionWithCompleteDetails(auctionID);
 
         if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         Auction auction = optionalAuction.get();
 

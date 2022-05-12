@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import silkroad.dtos.user.request.UserCredentials;
-import silkroad.exceptions.SilkRoadExceptionDTO;
+import silkroad.exceptions.SilkRoadExceptionDetails;
 import silkroad.exceptions.UserException;
 
 
@@ -56,18 +56,17 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException) throws IOException, ServletException {
 
-        System.out.println(authenticationException.getClass().getName());
         UserException userException;
         if (authenticationException instanceof DisabledException)
-            userException = new UserException(UserException.DISABLED, HttpStatus.UNAUTHORIZED);
+            userException = new UserException(UserException.USER_DISABLED, HttpStatus.UNAUTHORIZED);
         else if (authenticationException instanceof BadCredentialsException)
-            userException = new UserException(UserException.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
+            userException = new UserException(UserException.USER_BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
         else {
             super.unsuccessfulAuthentication(request, response, authenticationException);
             return;
         }
 
-        SilkRoadExceptionDTO silkRoadException = new SilkRoadExceptionDTO(userException);
+        SilkRoadExceptionDetails silkRoadException = new SilkRoadExceptionDetails(userException);
         PrintWriter printWriter = response.getWriter();
         ObjectMapper objectMapper = new ObjectMapper();
         printWriter.println(objectMapper.writeValueAsString(silkRoadException));

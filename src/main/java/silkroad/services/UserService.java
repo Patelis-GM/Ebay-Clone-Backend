@@ -63,10 +63,10 @@ public class UserService implements UserDetailsService {
     public void signUpUser(UserRegistration user) {
 
         if (this.userRepository.existsByUsername(user.getUsername()))
-            throw new UserException(user.getUsername(), UserException.USERNAME_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new UserException(user.getUsername(), UserException.USER_USERNAME_EXISTS, HttpStatus.BAD_REQUEST);
 
         if (this.userRepository.existsByEmail(user.getEmail()))
-            throw new UserException(user.getEmail(), UserException.EMAIL_EXISTS, HttpStatus.BAD_REQUEST);
+            throw new UserException(user.getEmail(), UserException.USER_EMAIL_EXISTS, HttpStatus.BAD_REQUEST);
 
 
         User newUser = new User(user.getUsername(),
@@ -85,7 +85,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void approveUser(String username) {
         if (this.userRepository.updateApprovalStatusByUsername(username, true) == 0)
-            throw new UserException(username, UserException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new UserException(username, UserException.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     public UserCompleteDetails getUser(String username) {
@@ -96,10 +96,11 @@ public class UserService implements UserDetailsService {
             return this.userMapper.toUserCompleteDetails(optionalUser.get());
 
         else
-            throw new UserException(username, UserException.NOT_FOUND, HttpStatus.NOT_FOUND);
+            throw new UserException(username, UserException.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     public PageResponse<UserBasicDetails> getUsersBasicDetails(Boolean approvalStatus, Integer pageIndex, Integer pageSize) {
+
         Specification<User> userSpecification = null;
 
         if (approvalStatus != null)

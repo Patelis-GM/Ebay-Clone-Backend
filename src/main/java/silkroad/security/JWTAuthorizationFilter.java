@@ -46,30 +46,21 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
                 else
                     response.setStatus(HttpStatus.BAD_REQUEST.value());
-
             }
 
         } else {
 
             if (isBearerOfJWT) {
 
-
                 DecodedJWT decodedJSONWebToken = JWTUtilities.verifyJWT(request);
 
                 if (decodedJSONWebToken != null) {
 
+                    String username = decodedJSONWebToken.getSubject();
 
+                    UserInformation userDetails = (UserInformation) this.userService.loadUserByUsername(username);
 
-                    List<String> load = JWTUtilities.extractLoad(decodedJSONWebToken);
-
-                    String username = load.get(0);
-                    List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-                    grantedAuthorities.add(new SimpleGrantedAuthority(load.get(1)));
-
-//                    UserInformation userDetails = (UserInformation) this.userService.loadUserByUsername(username);
-
-
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, userDetails.getAuthorities());
 
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }

@@ -31,18 +31,9 @@ public class JWTUtilities {
             JWTVerifier jwtVerifier = JWT.require(algorithm).build();
             return jwtVerifier.verify(JSONWebToken);
         } catch (JWTVerificationException e) {
-            e.printStackTrace();
             return null;
         }
     }
-
-    public static List<String> extractLoad(DecodedJWT decodedJWT) {
-        List<String> load = new ArrayList<>();
-        load.add(decodedJWT.getSubject());
-        load.add(decodedJWT.getClaim(JWT_ROLE_CLAIM_KEY).toString().replace("\"", ""));
-        return load;
-    }
-
 
     public static String generateJWT(Authentication authentication) {
 

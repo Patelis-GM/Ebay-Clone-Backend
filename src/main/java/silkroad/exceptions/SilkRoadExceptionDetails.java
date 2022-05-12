@@ -7,7 +7,7 @@ import silkroad.utilities.TimeManager;
 import java.util.Date;
 
 @Getter
-public class SilkRoadExceptionDTO {
+public class SilkRoadExceptionDetails {
 
     private final String exception;
     private final String message;
@@ -15,7 +15,7 @@ public class SilkRoadExceptionDTO {
     private final Integer status;
     private final Date timestamp;
 
-    public SilkRoadExceptionDTO(SilkRoadException silkRoadException) {
+    public SilkRoadExceptionDetails(SilkRoadException silkRoadException) {
         this.exception = silkRoadException.getClass().getName();
         this.message = silkRoadException.getMessage();
         this.code = silkRoadException.getCode();
@@ -23,7 +23,7 @@ public class SilkRoadExceptionDTO {
         this.timestamp = TimeManager.now();
     }
 
-    public SilkRoadExceptionDTO(Exception exception, HttpStatus httpStatus) {
+    public SilkRoadExceptionDetails(Exception exception, HttpStatus httpStatus) {
         this.exception = exception.getClass().getName();
         this.message = exception.getMessage();
         this.code = null;

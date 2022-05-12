@@ -1,7 +1,6 @@
 package silkroad.security;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
@@ -26,22 +24,20 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable();
 
         http.authorizeRequests()
-//                .antMatchers(HttpMethod.POST, "/admin/**").hasAuthority(Roles.ADMIN.toString())
-//                .antMatchers(HttpMethod.GET, "/admin/**").hasAuthority(Roles.ADMIN.toString())
-                .antMatchers("/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/approved").hasAnyAuthority(Roles.ADMIN.toString(), Roles.USER.toString())
-                .antMatchers("/auctions/check").permitAll()
-                .antMatchers("/auctions/**").hasAnyAuthority(Roles.ADMIN.toString(), Roles.USER.toString())
-                .antMatchers(HttpMethod.GET, "/admin").hasAnyAuthority(Roles.ADMIN.toString())
-                .antMatchers(HttpMethod.POST, "/sign-up").permitAll()
                 .antMatchers("/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/users").permitAll()
+                .antMatchers("/users/**").hasAnyAuthority(Roles.ADMIN.toString(), Roles.USER.toString())
+                .antMatchers(HttpMethod.GET, "/auctions").permitAll()
+                .antMatchers(HttpMethod.GET, "/auctions/{\\d+}").permitAll()
+                .antMatchers("/auctions/**").hasAnyAuthority(Roles.ADMIN.toString(), Roles.USER.toString())
+                .antMatchers("/categories").permitAll()
+                .antMatchers("/administration/**").hasAuthority(Roles.ADMIN.toString())
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManagerBean()))
