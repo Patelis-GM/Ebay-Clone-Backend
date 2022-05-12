@@ -32,7 +32,7 @@ public class AuctionController {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
         this.auctionService.createAuction(authentication, auctionDTO, multipartFiles);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /* Update Auction */
@@ -76,7 +76,7 @@ public class AuctionController {
     @RequestMapping(value = "/auctions/{auctionID}/bid", method = RequestMethod.POST)
     public ResponseEntity<Void> bid(Authentication authentication, @PathVariable Long auctionID, @RequestBody BidPosting bidPosting) {
         this.bidService.bid(authentication, auctionID, bidPosting.getAmount(), bidPosting.getVersion());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /* Get Auction Bids */

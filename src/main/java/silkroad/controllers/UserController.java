@@ -33,7 +33,7 @@ public class UserController {
         Address address = this.addressService.createOrFindAddress(user.getAddress());
         user.setAddress(address);
         this.userService.signUpUser(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/users/{username}/auctions", method = RequestMethod.GET)
@@ -73,7 +73,7 @@ public class UserController {
                                             @RequestBody MessagePosting messagePosting) {
         UserException.validateAuthentication(authentication, username);
         this.messageService.sendMessage(authentication, messagePosting);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/users/{username}/messages", method = RequestMethod.GET)
@@ -106,6 +106,5 @@ public class UserController {
         this.messageService.readUserMessage(authentication, messageID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 
 }
