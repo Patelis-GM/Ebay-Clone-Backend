@@ -85,13 +85,17 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
     }
 
 
-    public List<Auction> exportAuctions(Date from, Date to, Integer maxResults) {
+    public List<Auction> exportAuctions(Specification<Auction> specification, Integer maxResults) {
 
-        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.categories JOIN FETCH a.address JOIN FETCH a.seller ORDER BY a.id ASC", Auction.class).
-                setMaxResults(maxResults).
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> idQuery = getIDQuery(criteriaBuilder, specification);
+        List<Long> ids = entityManager.createQuery(idQuery).setMaxResults(maxResults).getResultList();
+
+
+        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.categories JOIN FETCH a.address JOIN FETCH a.seller WHERE a.id IN :ids", Auction.class).
+                setParameter("ids", ids).
                 setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
-//        typedQuery.setParameter("from", from);
-//        typedQuery.setParameter("to", to);
+
         List<Auction> auctions = typedQuery.getResultList();
 
         System.out.println(auctions.size());

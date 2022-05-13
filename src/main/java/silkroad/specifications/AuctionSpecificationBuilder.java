@@ -6,6 +6,7 @@ import silkroad.utilities.TimeManager;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AuctionSpecificationBuilder {
@@ -155,6 +156,11 @@ public class AuctionSpecificationBuilder {
             return criteriaBuilder.and(auctionPredicates.toArray(new Predicate[0]));
         };
 
+    }
+
+
+    public static Specification<Auction> getExportAuctionsSpecification(Date from, Date to) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get(Auction_.START_DATE), from, to);
     }
 
 }

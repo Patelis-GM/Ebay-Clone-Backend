@@ -196,8 +196,10 @@ public class AuctionService {
         HttpHeaders httpHeaders = new HttpHeaders();
         InputStream stringInputStream;
         InputStreamResource inputStreamResource;
+        Specification<Auction> auctionSpecification = AuctionSpecificationBuilder.getExportAuctionsSpecification(from,to);
 
-        List<Auction> auctions = this.auctionRepository.exportAuctions(from, to, 500);
+        List<Auction> auctions = this.auctionRepository.exportAuctions(auctionSpecification, 500);
+
         if (asJSON) {
             ObjectMapper objectMapper = getJSONMapper();
             AuctionJSONCollection auctionJSONCollection = new AuctionJSONCollection(jsonExportMapper.toAuctionJSONList(auctions));

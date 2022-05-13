@@ -13,6 +13,6 @@ public interface CustomAuctionRepository {
     Page<Auction> getUserAuctions(Specification<Auction> specification, PageRequest pageRequest);
     Page<Auction> getUserPurchases(Specification<Auction> specification, PageRequest pageRequest);
     Page<Auction> browseAuctions(Specification<Auction> specification, PageRequest pageRequest);
-    List<Auction> exportAuctions(Date from, Date to, Integer maxResults);
+    List<Auction> exportAuctions(Specification<Auction> specification, Integer maxResults);
 
 }
