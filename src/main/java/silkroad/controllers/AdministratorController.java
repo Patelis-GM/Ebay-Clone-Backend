@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.boot.web.servlet.server.Encoding;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import silkroad.dtos.page.PageResponse;
@@ -19,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
@@ -51,34 +53,11 @@ public class AdministratorController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/export", method = RequestMethod.GET)
-    public ResponseEntity<InputStreamResource> exportAuctions(@RequestParam(name = "format") String format,
-                                                              @RequestParam(name = "from") Long from,
-                                                              @RequestParam(name = "to") Long to) throws IOException {
+    public ResponseEntity<InputStreamResource> exportAuctions(@RequestParam(name = "json") Boolean asJSON,
+                                                              @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") Date from,
+                                                              @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") Date to) throws IOException {
 
-        String xmlString = this.auctionService.exportAuctions(format, from, to);
-//        byte[] xmlStringByteArray = xmlString.getBytes();
-//        response.setCharacterEncoding("UTF-8");
-//        response.setHeader("Content-Transfer-Encoding", "binary");
-//        response.setContentType(APPLICATION_XML_VALUE);
-//        response.setContentLength(xmlString.length());
-//        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Auctions.xml");
-
-
-        InputStream stringInputStream = new ByteArrayInputStream(xmlString.getBytes());
-        InputStreamResource inputStreamResource = new InputStreamResource(stringInputStream);
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_XML);
-        httpHeaders.setContentDispositionFormData("attachment", "ExportAuctions.xml");
-
-        //this copies the content of your string to the output stream
-//        IOUtils.copy(stringInputStream, response.getOutputStream());
-//
-//
-//        response.flushBuffer();
-
-        return new ResponseEntity<>(inputStreamResource, httpHeaders, HttpStatus.OK);
-//        return new ResponseEntity<>(this.auctionService.exportAuctions(format, from, to), HttpStatus.OK);
+        return this.auctionService.exportAuctions(asJSON, from, to);
     }
 
 

@@ -1,9 +1,6 @@
 package silkroad.views.json;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
+@JsonPropertyOrder({"id", "name", "categories", "highestBid", "buyPrice", "firstBid", "totalBids", "bids", "address", "startDate", "endDate", "seller", "description"})
 public class AuctionJSON implements Serializable {
 
     public AuctionJSON(Long id, String name, List<String> categories, String highestBid, String buyPrice, String firstBid, Long totalBids, List<BidJSON> bids, AddressJSON address, SellerJSON seller, Date startDate, Date endDate, String description) {

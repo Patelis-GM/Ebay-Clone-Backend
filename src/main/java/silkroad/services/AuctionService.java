@@ -2,14 +2,19 @@ package silkroad.services;
 
 import com.ctc.wstx.api.WstxOutputProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +31,13 @@ import silkroad.exceptions.AuctionException;
 import silkroad.exceptions.UserException;
 import silkroad.repositories.*;
 import silkroad.specifications.AuctionSpecificationBuilder;
+import silkroad.views.json.AuctionJSONCollection;
+import silkroad.views.json.JSONMapper;
 import silkroad.views.xml.AuctionXMLCollection;
 import silkroad.views.xml.XMLMapper;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.*;
 
 @Service
@@ -42,6 +51,7 @@ public class AuctionService {
     private final AuctionMapper auctionMapper;
     private final SearchHistoryRepository searchHistoryRepository;
     private final XMLMapper xmlExportMapper;
+    private final JSONMapper jsonExportMapper;
 
     @Transactional
     public void createAuction(Authentication authentication, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
@@ -181,17 +191,49 @@ public class AuctionService {
 
     }
 
-    public String exportAuctions(String format, Long from, Long to) throws JsonProcessingException {
+    public ResponseEntity<InputStreamResource> exportAuctions(Boolean asJSON, Date from, Date to) throws JsonProcessingException {
 
+        HttpHeaders httpHeaders = new HttpHeaders();
+        InputStream stringInputStream;
+        InputStreamResource inputStreamResource;
+
+        List<Auction> auctions = this.auctionRepository.exportAuctions(from, to, 500);
+        if (asJSON) {
+            ObjectMapper objectMapper = getJSONMapper();
+            AuctionJSONCollection auctionJSONCollection = new AuctionJSONCollection(jsonExportMapper.toAuctionJSONList(auctions));
+            String jsonString = objectMapper.writeValueAsString(auctionJSONCollection);
+            stringInputStream = new ByteArrayInputStream(jsonString.getBytes());
+            inputStreamResource = new InputStreamResource(stringInputStream);
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            httpHeaders.setContentDispositionFormData("attachment", "ExportAuctions.json");
+        } else {
+            XmlMapper xmlMapper = getXMLMapper();
+            AuctionXMLCollection auctionXMLCollection = new AuctionXMLCollection(xmlExportMapper.toAuctionXMLList(auctions));
+            String xmlString = xmlMapper.writeValueAsString(auctionXMLCollection);
+            stringInputStream = new ByteArrayInputStream(xmlString.getBytes());
+            inputStreamResource = new InputStreamResource(stringInputStream);
+            httpHeaders.setContentType(MediaType.APPLICATION_XML);
+            httpHeaders.setContentDispositionFormData("attachment", "ExportAuctions.xml");
+        }
+
+        return new ResponseEntity<>(inputStreamResource, httpHeaders, HttpStatus.OK);
+    }
+
+    private XmlMapper getXMLMapper() {
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.getFactory().getXMLOutputFactory().setProperty(WstxOutputProperties.P_AUTOMATIC_END_ELEMENTS, false);
         xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-
-        List<Auction> auctions = this.auctionRepository.exportAuctions(new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()), 500);
-
-        AuctionXMLCollection auctionXMLCollection = new AuctionXMLCollection(xmlExportMapper.toAuctionXMLList(auctions));
-        return xmlMapper.writeValueAsString(auctionXMLCollection);
+        return xmlMapper;
     }
+
+    private ObjectMapper getJSONMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return objectMapper;
+    }
+
+
 }

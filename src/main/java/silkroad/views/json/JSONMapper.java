@@ -34,6 +34,8 @@ public interface JSONMapper {
     @Mapping(target = "firstBid", expression = "java(mapCurrency(auction.getFirstBid(), US_CURRENCY))")
     AuctionJSON toAuctionJSON(Auction auction);
 
+    List<AuctionJSON> toAuctionJSONList(List<Auction> auctions);
+
     default List<String> mapCategories(Set<Category> categories) {
         return categories.stream().map(Category::getName).collect(Collectors.toList());
     }
