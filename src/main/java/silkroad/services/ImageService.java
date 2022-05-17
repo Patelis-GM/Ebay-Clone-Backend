@@ -22,7 +22,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ImageService {
 
-    private final String uploadsDirectory = "C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/";
+    private final String uploadsDirectory = "Uploads/";
     private final ImageRepository imageRepository;
 
     @Transactional
