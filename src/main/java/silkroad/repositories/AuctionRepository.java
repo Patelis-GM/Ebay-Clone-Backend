@@ -35,7 +35,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
     @Query("SELECT a.seller.username FROM Auction a WHERE a.id = ?1")
     String findAuctionSellerById(Long auctionID);
 
-    @Query("SELECT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.seller WHERE a.id = ?1")
+    @Query("SELECT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.seller JOIN FETCH a.categories WHERE a.id = ?1")
     Optional<Auction> fetchAuctionWithCompleteDetails(Long auctionID);
 
 }

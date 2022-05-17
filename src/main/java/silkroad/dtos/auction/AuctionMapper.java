@@ -19,6 +19,7 @@ public interface AuctionMapper {
     @Mapping(target = "sellerRating", source = "seller.sellerRating")
     @Mapping(target = "sellerUsername", source = "seller.username")
     @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
+    @Mapping(target = "categories", expression = "java(mapCategories(auction.getCategories()))")
     AuctionBrowsingCompleteDetails toAuctionBrowsingCompleteDetails(Auction auction);
 
     @Mapping(source = "address.country", target = "country")

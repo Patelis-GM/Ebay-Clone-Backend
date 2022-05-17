@@ -7,6 +7,7 @@ import silkroad.utilities.TimeManager;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 public class AuctionBrowsingCompleteDetails implements Serializable {
@@ -25,9 +26,10 @@ public class AuctionBrowsingCompleteDetails implements Serializable {
     private final Address address;
     private final Boolean expired;
     private final Long version;
+    private final Set<String> categories;
 
 
-    public AuctionBrowsingCompleteDetails(Long id, String name, String description, Date endDate, Double buyPrice, Double firstBid, Long totalBids, Double highestBid, String sellerUsername, Double sellerRating, List<String> images, Address address,Long version) {
+    public AuctionBrowsingCompleteDetails(Long id, String name, String description, Date endDate, Double buyPrice, Double firstBid, Long totalBids, Double highestBid, String sellerUsername, Double sellerRating, List<String> images, Address address, Long version, Set<String> categories) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -42,5 +44,6 @@ public class AuctionBrowsingCompleteDetails implements Serializable {
         this.address = address;
         this.expired = ((TimeManager.now().getTime() >= this.endDate.getTime()) || (this.buyPrice != null && this.highestBid >= this.buyPrice));
         this.version = version;
+        this.categories = categories;
     }
 }

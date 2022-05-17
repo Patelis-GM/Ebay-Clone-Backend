@@ -70,6 +70,7 @@ public class BidService {
         Optional<Bid> optionalBid = this.bidRepository.findByAuctionAndBidder(auctionID, authentication.getName());
         Bid bid;
 
+        // TODO + 1 + Change User - Auction Entities
         SearchHistory searchHistoryRecord = new SearchHistory(new SearchHistoryID(auctionID, authentication.getName()), auction, bidder);
         this.searchHistoryRepository.save(searchHistoryRecord);
 

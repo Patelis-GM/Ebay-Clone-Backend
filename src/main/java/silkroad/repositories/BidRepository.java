@@ -31,7 +31,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     Page<Bid> findByAuctionId(Long auctionID, Pageable pageable);
 
 
-    @Query(value = "SELECT b FROM Bid b JOIN FETCH b.auction WHERE b.bidder.username = ?1",
+    @Query(value = "SELECT b FROM Bid b JOIN FETCH b.auction as auction JOIN FETCH auction.images WHERE b.bidder.username = ?1",
             countQuery = "SELECT COUNT(b) FROM Bid b WHERE b.bidder.username = ?1")
     Page<Bid> findByUserId(String username, Pageable pageRequest);
 }

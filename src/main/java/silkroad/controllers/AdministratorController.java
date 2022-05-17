@@ -54,9 +54,8 @@ public class AdministratorController {
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/export", method = RequestMethod.GET)
     public ResponseEntity<InputStreamResource> exportAuctions(@RequestParam(name = "json") Boolean asJSON,
-                                                              @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") Date from,
-                                                              @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") Date to) throws IOException {
-
+                                                              @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss") Date from,
+                                                              @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss") Date to) throws IOException {
         return this.auctionService.exportAuctions(asJSON, from, to);
     }
 

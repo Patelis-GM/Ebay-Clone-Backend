@@ -56,6 +56,9 @@ public class AuctionService {
     @Transactional
     public void createAuction(Authentication authentication, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
+        if (multipartFiles.length == 0)
+            throw new AuctionException(AuctionException.AUCTION_NO_MEDIA, HttpStatus.BAD_REQUEST);
+
         Set<Category> auctionCategories = this.categoryRepository.findAllDistinct(auctionDTO.getCategories());
 
         if (auctionCategories.size() != auctionDTO.getCategories().size())
@@ -77,6 +80,9 @@ public class AuctionService {
 
     @Transactional
     public void updateAuction(Authentication authentication, Long auctionID, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
+
+        if (multipartFiles.length == 0)
+            throw new AuctionException(AuctionException.AUCTION_NO_MEDIA, HttpStatus.BAD_REQUEST);
 
         if (!this.auctionRepository.existsById(auctionID))
             throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -138,6 +144,7 @@ public class AuctionService {
         Auction auction = optionalAuction.get();
 
         if (authentication != null) {
+            // TODO + 1
             SearchHistory searchHistoryRecord = new SearchHistory(new SearchHistoryID(auctionID, authentication.getName()), auction, this.userRepository.getById(authentication.getName()));
             this.searchHistoryRepository.save(searchHistoryRecord);
         }
@@ -196,9 +203,10 @@ public class AuctionService {
         HttpHeaders httpHeaders = new HttpHeaders();
         InputStream stringInputStream;
         InputStreamResource inputStreamResource;
-        Specification<Auction> auctionSpecification = AuctionSpecificationBuilder.getExportAuctionsSpecification(from,to);
+        Specification<Auction> auctionSpecification = AuctionSpecificationBuilder.getExportAuctionsSpecification(from, to);
 
-        List<Auction> auctions = this.auctionRepository.exportAuctions(auctionSpecification, 500);
+        final Integer EXPORT_AUCTIONS_MAX_RESULTS = 500;
+        List<Auction> auctions = this.auctionRepository.exportAuctions(auctionSpecification, EXPORT_AUCTIONS_MAX_RESULTS);
 
         if (asJSON) {
             ObjectMapper objectMapper = getJSONMapper();
