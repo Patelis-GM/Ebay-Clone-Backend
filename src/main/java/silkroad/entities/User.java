@@ -8,10 +8,7 @@ import org.hibernate.Hibernate;
 import silkroad.utilities.TimeManager;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "user")
@@ -65,12 +62,8 @@ public class User {
     @Column(name = "join_date", nullable = false)
     private Date joinDate;
 
-    @ManyToMany
-    @JoinTable(
-            name = "searchhistory",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "auction_id")})
-    private Set<Auction> searchHistory = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "user")
+    private Set<SearchHistory> searchHistory = new LinkedHashSet<>();
 
     @ManyToMany
     @JoinTable(name = "messageaccess",

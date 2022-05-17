@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "searchhistory")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -26,5 +25,13 @@ public class SearchHistory {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "interactions", nullable = false)
+    private Long interactions;
 
+    public SearchHistory(SearchHistoryID id, Auction auction, User user) {
+        this.id = id;
+        this.auction = auction;
+        this.user = user;
+        this.interactions = 0L;
+    }
 }

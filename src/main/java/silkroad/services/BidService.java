@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,8 @@ import silkroad.exceptions.BidException;
 import silkroad.exceptions.UserException;
 import silkroad.repositories.AuctionRepository;
 import silkroad.repositories.BidRepository;
-import silkroad.repositories.SearchHistoryRepository;
 import silkroad.repositories.UserRepository;
+import silkroad.specifications.BidSpecificationBuilder;
 import silkroad.utilities.TimeManager;
 
 import java.util.Date;
@@ -35,7 +36,7 @@ public class BidService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
     private final BidMapper bidMapper;
-    private final SearchHistoryRepository searchHistoryRepository;
+    private final SearchHistoryService searchHistoryService;
 
     @Transactional
     public void bid(Authentication authentication, Long auctionID, Double amount, Long version) {
@@ -70,9 +71,7 @@ public class BidService {
         Optional<Bid> optionalBid = this.bidRepository.findByAuctionAndBidder(auctionID, authentication.getName());
         Bid bid;
 
-        // TODO + 1 + Change User - Auction Entities
-        SearchHistory searchHistoryRecord = new SearchHistory(new SearchHistoryID(auctionID, authentication.getName()), auction, bidder);
-        this.searchHistoryRepository.save(searchHistoryRecord);
+        this.searchHistoryService.recordUserInteraction(bidder, auction);
 
         if (optionalBid.isPresent()) {
             bid = optionalBid.get();
@@ -110,9 +109,11 @@ public class BidService {
 
     public PageResponse<BidBuyerDetails> getUserBids(Authentication authentication, Integer page, Integer size) {
 
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Bid_.SUBMISSION_DATE).descending());
+        PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Bid> bidsPage = this.bidRepository.findByUserId(authentication.getName(), pageRequest);
+        Specification<Bid> bidSpecification = BidSpecificationBuilder.getUserBidsSpecification(authentication.getName());
+
+        Page<Bid> bidsPage = this.bidRepository.findByUserId(bidSpecification, pageRequest);
 
         List<BidBuyerDetails> userBids = this.bidMapper.toBidBuyerDetailsList(bidsPage.getContent());
 

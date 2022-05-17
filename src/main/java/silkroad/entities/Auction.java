@@ -6,9 +6,6 @@ import lombok.Setter;
 import silkroad.utilities.TimeManager;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.*;
 
 @Entity
@@ -102,6 +99,9 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     Set<Category> categories = new HashSet<>();
 
+
+    @OneToMany(mappedBy = "auction")
+    private Set<SearchHistory> searchHistory = new LinkedHashSet<>();
 
     @Override
     public int hashCode() {

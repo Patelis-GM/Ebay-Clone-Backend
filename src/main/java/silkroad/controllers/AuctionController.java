@@ -12,6 +12,7 @@ import silkroad.dtos.auction.response.AuctionBrowsingCompleteDetails;
 import silkroad.dtos.bid.request.BidPosting;
 import silkroad.dtos.bid.response.BidSellerDetails;
 import silkroad.dtos.page.PageResponse;
+import silkroad.dtos.user.request.Username;
 import silkroad.entities.Address;
 import silkroad.services.AddressService;
 import silkroad.services.AuctionService;
@@ -61,6 +62,13 @@ public class AuctionController {
         return new ResponseEntity<>(this.auctionService.getAuction(authentication, auctionID), HttpStatus.OK);
     }
 
+    /* Get Auction Seller */
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/auctions/{auctionID}/seller", method = RequestMethod.GET)
+    public ResponseEntity<Username> getAuctionSeller(@PathVariable Long auctionID) {
+        return new ResponseEntity<>(this.auctionService.getAuctionSeller(auctionID), HttpStatus.OK);
+    }
+
     /* Browse Auctions */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions", method = RequestMethod.GET)
@@ -89,9 +97,9 @@ public class AuctionController {
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}/bid", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<BidSellerDetails>> getAuctionBids(Authentication authentication,
-                                                                  @PathVariable Long auctionID,
-                                                                  @RequestParam(name = "page") Integer pageIndex,
-                                                                  @RequestParam("size") Integer pageSize) {
+                                                                         @PathVariable Long auctionID,
+                                                                         @RequestParam(name = "page") Integer pageIndex,
+                                                                         @RequestParam("size") Integer pageSize) {
         return new ResponseEntity<>(this.bidService.getAuctionBids(authentication, auctionID, pageIndex - 1, pageSize), HttpStatus.OK);
     }
 

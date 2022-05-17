@@ -26,11 +26,13 @@ import silkroad.dtos.auction.response.AuctionBrowsingCompleteDetails;
 import silkroad.dtos.auction.response.AuctionCompleteDetails;
 import silkroad.dtos.auction.response.AuctionPurchaseDetails;
 import silkroad.dtos.page.PageResponse;
+import silkroad.dtos.user.request.Username;
 import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
 import silkroad.exceptions.UserException;
 import silkroad.repositories.*;
 import silkroad.specifications.AuctionSpecificationBuilder;
+import silkroad.utilities.TimeManager;
 import silkroad.views.json.AuctionJSONCollection;
 import silkroad.views.json.JSONMapper;
 import silkroad.views.xml.AuctionXMLCollection;
@@ -48,10 +50,11 @@ public class AuctionService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final ImageService imageService;
+    private final SearchHistoryService searchHistoryService;
     private final AuctionMapper auctionMapper;
-    private final SearchHistoryRepository searchHistoryRepository;
     private final XMLMapper xmlExportMapper;
     private final JSONMapper jsonExportMapper;
+
 
     @Transactional
     public void createAuction(Authentication authentication, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
@@ -90,10 +93,10 @@ public class AuctionService {
         if (!this.auctionRepository.findAuctionSellerById(auctionID).equals(authentication.getName()))
             throw new UserException(UserException.USER_ACTION_FORBIDDEN, HttpStatus.FORBIDDEN);
 
-        Optional<Auction> optionalAuction = this.auctionRepository.findUpdatableById(auctionID);
+        Optional<Auction> optionalAuction = this.auctionRepository.findUpdatableById(auctionID, TimeManager.now());
 
         if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_HAS_BID, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_HAS_BID_OR_EXPIRED, HttpStatus.BAD_REQUEST);
 
         Auction auction = optionalAuction.get();
 
@@ -125,14 +128,22 @@ public class AuctionService {
 
         this.imageService.deleteImages(auctionID, true);
 
-        this.searchHistoryRepository.deleteByAuctionId(auctionID);
+        this.searchHistoryService.deleteByAuctionId(auctionID);
 
         if (this.auctionRepository.removeById(auctionID) == 0)
-            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_HAS_BID, HttpStatus.BAD_REQUEST);
+            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_HAS_BID_OR_EXPIRED, HttpStatus.BAD_REQUEST);
 
         this.imageService.deleteImages(auctionID, false);
     }
 
+
+    public Username getAuctionSeller(Long auctionID) {
+
+        if (!this.auctionRepository.existsById(auctionID))
+            throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
+
+        return new Username(this.auctionRepository.findAuctionSellerById(auctionID));
+    }
 
     public AuctionBrowsingCompleteDetails getAuction(Authentication authentication, Long auctionID) {
 
@@ -143,15 +154,11 @@ public class AuctionService {
 
         Auction auction = optionalAuction.get();
 
-        if (authentication != null) {
-            // TODO + 1
-            SearchHistory searchHistoryRecord = new SearchHistory(new SearchHistoryID(auctionID, authentication.getName()), auction, this.userRepository.getById(authentication.getName()));
-            this.searchHistoryRepository.save(searchHistoryRecord);
-        }
+        if (authentication != null)
+            this.searchHistoryService.recordUserInteraction(this.userRepository.getById(authentication.getName()), auction);
 
         return this.auctionMapper.toAuctionBrowsingCompleteDetails(auction);
     }
-
 
     public PageResponse<AuctionBrowsingBasicDetails> browseAuctions(Integer page, Integer size, String textSearch, Double minimumPrice, Double maximumPrice, String category, String location, Boolean hasBuyPrice) {
 

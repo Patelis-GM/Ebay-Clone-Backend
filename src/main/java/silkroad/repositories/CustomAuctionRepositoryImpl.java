@@ -15,7 +15,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.Date;
 import java.util.List;
 
 @Transactional(readOnly = true)
@@ -98,7 +97,6 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
 
         List<Auction> auctions = typedQuery.getResultList();
 
-        System.out.println(auctions.size());
 
         typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a LEFT JOIN FETCH a.bids AS bids LEFT JOIN FETCH bids.bidder AS bidder LEFT JOIN FETCH bidder.address WHERE a IN :auctions ORDER BY a.id ASC", Auction.class);
         typedQuery.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
