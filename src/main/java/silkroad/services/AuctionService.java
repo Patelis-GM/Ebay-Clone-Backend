@@ -195,8 +195,6 @@ public class AuctionService {
     }
 
 
-
-
     public ResponseEntity<InputStreamResource> exportAuctions(Boolean asJSON, Date from, Date to) throws JsonProcessingException {
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -205,19 +203,20 @@ public class AuctionService {
         Specification<Auction> auctionSpecification = AuctionSpecificationBuilder.getExportAuctionsSpecification(from, to);
 
         final Integer EXPORT_AUCTIONS_MAX_RESULTS = 500;
+        final String CURRENCY = "$";
         List<Auction> auctions = this.auctionRepository.exportAuctions(auctionSpecification, EXPORT_AUCTIONS_MAX_RESULTS);
 
         if (asJSON) {
-            ObjectMapper objectMapper = getJSONMapper();
-            AuctionJSONCollection auctionJSONCollection = new AuctionJSONCollection(jsonExportMapper.toAuctionJSONList(auctions));
+            ObjectMapper objectMapper = getJSONMapper(TimeZone.getDefault());
+            AuctionJSONCollection auctionJSONCollection = new AuctionJSONCollection(jsonExportMapper.toAuctionJSONList(auctions, CURRENCY));
             String jsonString = objectMapper.writeValueAsString(auctionJSONCollection);
             stringInputStream = new ByteArrayInputStream(jsonString.getBytes());
             inputStreamResource = new InputStreamResource(stringInputStream);
             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
             httpHeaders.setContentDispositionFormData("attachment", "ExportAuctions.json");
         } else {
-            XmlMapper xmlMapper = getXMLMapper();
-            AuctionXMLCollection auctionXMLCollection = new AuctionXMLCollection(xmlExportMapper.toAuctionXMLList(auctions));
+            XmlMapper xmlMapper = getXMLMapper(TimeZone.getDefault());
+            AuctionXMLCollection auctionXMLCollection = new AuctionXMLCollection(xmlExportMapper.toAuctionXMLList(auctions, CURRENCY));
             String xmlString = xmlMapper.writeValueAsString(auctionXMLCollection);
             stringInputStream = new ByteArrayInputStream(xmlString.getBytes());
             inputStreamResource = new InputStreamResource(stringInputStream);
@@ -228,21 +227,21 @@ public class AuctionService {
         return new ResponseEntity<>(inputStreamResource, httpHeaders, HttpStatus.OK);
     }
 
-    private XmlMapper getXMLMapper() {
+    private XmlMapper getXMLMapper(TimeZone timeZone) {
         XmlMapper xmlMapper = new XmlMapper();
         xmlMapper.getFactory().getXMLOutputFactory().setProperty(WstxOutputProperties.P_AUTOMATIC_END_ELEMENTS, false);
         xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-        xmlMapper.setTimeZone(TimeZone.getDefault());
+        xmlMapper.setTimeZone(timeZone);
         return xmlMapper;
     }
 
-    private ObjectMapper getJSONMapper() {
+    private ObjectMapper getJSONMapper(TimeZone timeZone) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.setTimeZone(TimeZone.getDefault());
+        objectMapper.setTimeZone(timeZone);
         return objectMapper;
     }
 
