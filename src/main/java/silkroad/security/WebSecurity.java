@@ -18,6 +18,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import silkroad.entities.Roles;
 import silkroad.services.UserService;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 @EnableWebSecurity
 @Configuration
 @AllArgsConstructor
@@ -63,12 +66,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(Collections.singletonList("*"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"));
         config.applyPermitDefaultValues();
         config.addExposedHeader("Authorization");
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 
 }
