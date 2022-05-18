@@ -11,14 +11,9 @@ import java.util.List;
 public class AuctionPurchaseDetails implements Serializable {
 
     private final Long id;
-
     private final String name;
-
     private final String seller;
-
     private final Double cost;
-
     private final Date date;
-
     private final List<String> images;
 }

@@ -24,7 +24,7 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
     EntityManager entityManager;
 
     @Override
-    public Page<Auction> getUserAuctions(Specification<Auction> specification, PageRequest pageRequest) {
+    public Page<Auction> getUserPostedAuctions(Specification<Auction> specification, PageRequest pageRequest) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> idQuery = getIDQuery(criteriaBuilder, specification);
@@ -33,16 +33,10 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
         CriteriaQuery<Long> countQuery = getCountQuery(criteriaBuilder, specification);
         Long count = entityManager.createQuery(countQuery).getSingleResult();
 
-        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.categories JOIN FETCH a.address LEFT JOIN FETCH a.latestBid WHERE a.id in :ids", Auction.class);
+        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a LEFT JOIN FETCH a.latestBid JOIN FETCH a.images WHERE a.id in :ids", Auction.class);
         typedQuery.setParameter("ids", ids);
         typedQuery.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
         List<Auction> auctions = typedQuery.getResultList();
-
-
-        typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.images WHERE a IN :auctions", Auction.class);
-        typedQuery.setParameter("auctions", auctions);
-        typedQuery.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
-        auctions = typedQuery.getResultList();
 
         return new PageImpl<>(auctions, pageRequest, count);
     }

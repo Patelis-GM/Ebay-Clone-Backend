@@ -1,13 +1,11 @@
 package silkroad.dtos.auction;
 
 import org.mapstruct.*;
-import silkroad.dtos.auction.response.AuctionBrowsingBasicDetails;
-import silkroad.dtos.auction.response.AuctionBrowsingCompleteDetails;
-import silkroad.dtos.auction.response.AuctionCompleteDetails;
-import silkroad.dtos.auction.response.AuctionPurchaseDetails;
+import silkroad.dtos.auction.response.*;
 import silkroad.entities.Auction;
 import silkroad.entities.Category;
 import silkroad.entities.Image;
+import silkroad.utilities.TimeManager;
 
 import java.util.List;
 import java.util.Set;
@@ -16,25 +14,16 @@ import java.util.stream.Collectors;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface AuctionMapper {
 
-    @Mapping(target = "sellerRating", source = "seller.sellerRating")
-    @Mapping(target = "sellerUsername", source = "seller.username")
-    @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
-    @Mapping(target = "categories", expression = "java(mapCategories(auction.getCategories()))")
-    AuctionBrowsingCompleteDetails toAuctionBrowsingCompleteDetails(Auction auction);
+    /* As Browser */
 
     @Mapping(source = "address.country", target = "country")
     @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
-    AuctionBrowsingBasicDetails toAuctionBrowsingBasicDetails(Auction auction);
+    AuctionBrowsingDetails toAuctionBrowsingDetails(Auction auction);
 
-    List<AuctionBrowsingBasicDetails> toAuctionBrowsingBasicDetailsList(List<Auction> auctions);
+    List<AuctionBrowsingDetails> toAuctionBrowsingDetailsList(List<Auction> auctions);
 
-    @Mapping(source = "latestBid.bidder.username", target = "bidder")
-    @Mapping(target = "categories", expression = "java(mapCategories(auction.getCategories()))")
-    @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
-    AuctionCompleteDetails toAuctionCompleteDetails(Auction auction);
 
-    List<AuctionCompleteDetails> toAuctionCompleteDetailsDetailsList(List<Auction> auctions);
-
+    /* As Buyer */
     @Mapping(target = "date", source = "latestBid.submissionDate")
     @Mapping(target = "cost", source = "latestBid.amount")
     @Mapping(target = "seller", source = "seller.username")
@@ -43,13 +32,36 @@ public interface AuctionMapper {
 
     List<AuctionPurchaseDetails> toAuctionPurchaseDetailsList(List<Auction> auctions);
 
+
+    /* As Seller  */
+    @Mapping(target = "bidder", source = "latestBid.bidder.username")
+    @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
+    @Mapping(target = "expired", expression = "java(mapExpired(auction))")
+    AuctionBasicDetails toAuctionBasicDetails(Auction auction);
+
+    List<AuctionBasicDetails> toAuctionBasicDetailsList(List<Auction> auctions);
+
+
+
+    /* As Everyone */
+    @Mapping(target = "sellerRating", source = "seller.sellerRating")
+    @Mapping(target = "seller", source = "seller.username")
+    @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
+    @Mapping(target = "categories", expression = "java(mapCategories(auction.getCategories()))")
+    @Mapping(target = "expired", expression = "java(mapExpired(auction))")
+    AuctionCompleteDetails toAuctionCompleteDetails(Auction auction);
+
+
     default List<String> mapImages(List<Image> images) {
         return images.stream().map(Image::getPath).collect(Collectors.toList());
     }
 
-    default Set<String> mapCategories(Set<Category> categories) {
-        return categories.stream().map(Category::getName).collect(Collectors.toSet());
+    default List<String> mapCategories(Set<Category> categories) {
+        return categories.stream().map(Category::getName).collect(Collectors.toList());
     }
 
+    default Boolean mapExpired(Auction auction) {
+        return ((TimeManager.now().getTime() >= auction.getEndDate().getTime()) || (auction.getBuyPrice() != null && auction.getHighestBid() >= auction.getBuyPrice()));
+    }
 
 }

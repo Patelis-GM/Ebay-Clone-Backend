@@ -3,6 +3,7 @@ package silkroad.entities;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 import silkroad.utilities.TimeManager;
 
 import javax.persistence.*;
@@ -104,8 +105,15 @@ public class Auction {
     private Set<SearchHistory> searchHistory = new LinkedHashSet<>();
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Auction auction = (Auction) o;
+        return id != null && Objects.equals(id, auction.id);
+    }
+
+    @Override
     public int hashCode() {
         return getClass().hashCode();
     }
-
 }

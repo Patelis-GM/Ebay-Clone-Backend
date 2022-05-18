@@ -1,9 +1,7 @@
 package silkroad.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import lombok.AllArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.boot.web.servlet.server.Encoding;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
@@ -11,18 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import silkroad.dtos.page.PageResponse;
 import silkroad.dtos.user.response.UserBasicDetails;
 import silkroad.dtos.user.response.UserCompleteDetails;
-import silkroad.entities.Auction;
 import silkroad.services.AuctionService;
 import silkroad.services.UserService;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
 @AllArgsConstructor
 @RestController

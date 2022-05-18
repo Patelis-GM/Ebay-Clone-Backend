@@ -21,12 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import silkroad.dtos.auction.AuctionMapper;
 import silkroad.dtos.auction.request.AuctionPosting;
-import silkroad.dtos.auction.response.AuctionBrowsingBasicDetails;
-import silkroad.dtos.auction.response.AuctionBrowsingCompleteDetails;
-import silkroad.dtos.auction.response.AuctionCompleteDetails;
-import silkroad.dtos.auction.response.AuctionPurchaseDetails;
+import silkroad.dtos.auction.response.*;
 import silkroad.dtos.page.PageResponse;
-import silkroad.dtos.user.request.Username;
 import silkroad.entities.*;
 import silkroad.exceptions.AuctionException;
 import silkroad.exceptions.UserException;
@@ -84,11 +80,11 @@ public class AuctionService {
     @Transactional
     public void updateAuction(Authentication authentication, Long auctionID, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
-        if (multipartFiles.length == 0)
-            throw new AuctionException(AuctionException.AUCTION_NO_MEDIA, HttpStatus.BAD_REQUEST);
-
         if (!this.auctionRepository.existsById(auctionID))
             throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
+
+        if (multipartFiles.length == 0)
+            throw new AuctionException(AuctionException.AUCTION_NO_MEDIA, HttpStatus.BAD_REQUEST);
 
         if (!this.auctionRepository.findAuctionSellerById(auctionID).equals(authentication.getName()))
             throw new UserException(UserException.USER_ACTION_FORBIDDEN, HttpStatus.FORBIDDEN);
@@ -130,37 +126,30 @@ public class AuctionService {
 
         this.searchHistoryService.deleteByAuctionId(auctionID);
 
-        if (this.auctionRepository.removeById(auctionID) == 0)
+        if (this.auctionRepository.removeById(auctionID, TimeManager.now()) == 0)
             throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_HAS_BID_OR_EXPIRED, HttpStatus.BAD_REQUEST);
 
         this.imageService.deleteImages(auctionID, false);
     }
 
 
-    public Username getAuctionSeller(Long auctionID) {
+    public AuctionCompleteDetails getAuction(Authentication authentication, Long auctionID) {
 
-        if (!this.auctionRepository.existsById(auctionID))
-            throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
-
-        return new Username(this.auctionRepository.findAuctionSellerById(auctionID));
-    }
-
-    public AuctionBrowsingCompleteDetails getAuction(Authentication authentication, Long auctionID) {
-
-        Optional<Auction> optionalAuction = this.auctionRepository.fetchAuctionWithCompleteDetails(auctionID);
+        Optional<Auction> optionalAuction = this.auctionRepository.fetchAuctionDetails(auctionID);
 
         if (optionalAuction.isEmpty())
             throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         Auction auction = optionalAuction.get();
+        auction = this.auctionRepository.fetchAuctionCategories(auction);
 
         if (authentication != null && !Objects.equals(authentication.getName(), auction.getSeller().getUsername()))
             this.searchHistoryService.recordUserInteraction(this.userRepository.getById(authentication.getName()), auction);
 
-        return this.auctionMapper.toAuctionBrowsingCompleteDetails(auction);
+        return this.auctionMapper.toAuctionCompleteDetails(auction);
     }
 
-    public PageResponse<AuctionBrowsingBasicDetails> browseAuctions(Integer page, Integer size, String textSearch, Double minimumPrice, Double maximumPrice, String category, String location, Boolean hasBuyPrice) {
+    public PageResponse<AuctionBrowsingDetails> browseAuctions(Integer page, Integer size, String textSearch, Double minimumPrice, Double maximumPrice, String category, String location, Boolean hasBuyPrice) {
 
         PageRequest pageRequest = PageRequest.of(page, size);
 
@@ -168,13 +157,13 @@ public class AuctionService {
 
         Page<Auction> auctionPage = this.auctionRepository.browseAuctions(auctionSpecification, pageRequest);
 
-        List<AuctionBrowsingBasicDetails> auctionBrowsingBasicDetailsList = this.auctionMapper.toAuctionBrowsingBasicDetailsList(auctionPage.getContent());
+        List<AuctionBrowsingDetails> auctionBrowsingDetailsList = this.auctionMapper.toAuctionBrowsingDetailsList(auctionPage.getContent());
 
-        return new PageResponse<>(auctionBrowsingBasicDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
+        return new PageResponse<>(auctionBrowsingDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
 
     }
 
-    public PageResponse<AuctionCompleteDetails> getUserPostedAuctions(Authentication authentication, Integer page, Integer size, Boolean active, Boolean sold) {
+    public PageResponse<AuctionBasicDetails> getUserPostedAuctions(Authentication authentication, Integer page, Integer size, Boolean active, Boolean sold) {
 
         String username = authentication.getName();
 
@@ -182,9 +171,9 @@ public class AuctionService {
 
         Specification<Auction> auctionSpecification = AuctionSpecificationBuilder.getUserPostedAuctionsSpecification(username, active, sold);
 
-        Page<Auction> auctionPage = this.auctionRepository.getUserAuctions(auctionSpecification, pageRequest);
+        Page<Auction> auctionPage = this.auctionRepository.getUserPostedAuctions(auctionSpecification, pageRequest);
 
-        List<AuctionCompleteDetails> auctionBasicDetailsList = this.auctionMapper.toAuctionCompleteDetailsDetailsList(auctionPage.getContent());
+        List<AuctionBasicDetails> auctionBasicDetailsList = this.auctionMapper.toAuctionBasicDetailsList(auctionPage.getContent());
 
         return new PageResponse<>(auctionBasicDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
     }
@@ -204,6 +193,9 @@ public class AuctionService {
         return new PageResponse<>(auctionPurchaseDetailsList, auctionPage.getNumber() + 1, auctionPage.getTotalPages(), auctionPage.getTotalElements(), auctionPage.getNumberOfElements());
 
     }
+
+
+
 
     public ResponseEntity<InputStreamResource> exportAuctions(Boolean asJSON, Date from, Date to) throws JsonProcessingException {
 

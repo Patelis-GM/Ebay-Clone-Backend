@@ -7,8 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import silkroad.dtos.auction.request.AuctionPosting;
-import silkroad.dtos.auction.response.AuctionBrowsingBasicDetails;
-import silkroad.dtos.auction.response.AuctionBrowsingCompleteDetails;
+import silkroad.dtos.auction.response.AuctionBrowsingDetails;
+import silkroad.dtos.auction.response.AuctionCompleteDetails;
 import silkroad.dtos.bid.request.BidPosting;
 import silkroad.dtos.bid.response.BidSellerDetails;
 import silkroad.dtos.page.PageResponse;
@@ -58,28 +58,22 @@ public class AuctionController {
     /* Get Auction */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}", method = RequestMethod.GET)
-    public ResponseEntity<AuctionBrowsingCompleteDetails> getAuction(Authentication authentication, @PathVariable Long auctionID) {
+    public ResponseEntity<AuctionCompleteDetails> getAuction(Authentication authentication, @PathVariable Long auctionID) {
         return new ResponseEntity<>(this.auctionService.getAuction(authentication, auctionID), HttpStatus.OK);
     }
 
-    /* Get Auction Seller */
-    @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/auctions/{auctionID}/seller", method = RequestMethod.GET)
-    public ResponseEntity<Username> getAuctionSeller(@PathVariable Long auctionID) {
-        return new ResponseEntity<>(this.auctionService.getAuctionSeller(auctionID), HttpStatus.OK);
-    }
 
     /* Browse Auctions */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions", method = RequestMethod.GET)
-    public ResponseEntity<PageResponse<AuctionBrowsingBasicDetails>> browseAuctions(@RequestParam(name = "query", required = false) String textSearch,
-                                                                                    @RequestParam(name = "min-price", required = false) Double minPrice,
-                                                                                    @RequestParam(name = "max-price", required = false) Double maxPrice,
-                                                                                    @RequestParam(name = "location", required = false) String location,
-                                                                                    @RequestParam(name = "category", required = false) String category,
-                                                                                    @RequestParam(name = "buy-now", required = false) Boolean hasBuyPrice,
-                                                                                    @RequestParam(name = "page") Integer pageIndex,
-                                                                                    @RequestParam(name = "size") Integer pageSize) {
+    public ResponseEntity<PageResponse<AuctionBrowsingDetails>> browseAuctions(@RequestParam(name = "query", required = false) String textSearch,
+                                                                               @RequestParam(name = "min-price", required = false) Double minPrice,
+                                                                               @RequestParam(name = "max-price", required = false) Double maxPrice,
+                                                                               @RequestParam(name = "location", required = false) String location,
+                                                                               @RequestParam(name = "category", required = false) String category,
+                                                                               @RequestParam(name = "buy-now", required = false) Boolean hasBuyPrice,
+                                                                               @RequestParam(name = "page") Integer pageIndex,
+                                                                               @RequestParam(name = "size") Integer pageSize) {
 
         return new ResponseEntity<>(this.auctionService.browseAuctions(pageIndex - 1, pageSize, textSearch, minPrice, maxPrice, category, location, hasBuyPrice), HttpStatus.OK);
     }

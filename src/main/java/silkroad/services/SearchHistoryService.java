@@ -17,9 +17,10 @@ public class SearchHistoryService {
 
     @Transactional
     public void recordUserInteraction(User user, Auction auction) {
+        final Long interactionsCeiling = 10L;
         SearchHistoryID searchHistoryID = new SearchHistoryID(auction.getId(), user.getUsername());
         if (this.searchHistoryRepository.existsById(searchHistoryID))
-            this.searchHistoryRepository.updateInteractionsById(searchHistoryID);
+            this.searchHistoryRepository.updateInteractionsById(searchHistoryID, interactionsCeiling);
         else
             this.searchHistoryRepository.save(new SearchHistory(searchHistoryID, auction, user));
     }

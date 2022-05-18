@@ -23,20 +23,22 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
     Optional<Auction> findBiddableById(Long auctionID, Date now, Long version);
 
     @Transactional
-    @Query("SELECT a FROM Auction a WHERE a.id = ?1 AND a.latestBid is NULL AND a.endDate < ?2")
+    @Query("SELECT a FROM Auction a WHERE a.id = ?1 AND a.latestBid is NULL AND a.endDate > ?2")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Auction> findUpdatableById(Long id, Date now);
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM Auction a WHERE a.id = ?1 AND a.latestBid is NULL")
-    Integer removeById(Long auctionID);
+    @Query("DELETE FROM Auction a WHERE a.id = ?1 AND a.latestBid is NULL AND a.endDate > ?2")
+    Integer removeById(Long auctionID, Date now);
 
     @Query("SELECT a.seller.username FROM Auction a WHERE a.id = ?1")
     String findAuctionSellerById(Long auctionID);
 
-    @Query("SELECT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.seller JOIN FETCH a.categories WHERE a.id = ?1")
-    Optional<Auction> fetchAuctionWithCompleteDetails(Long auctionID);
+    @Query("SELECT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.seller WHERE a.id = ?1")
+    Optional<Auction> fetchAuctionDetails(Long auctionID);
 
+    @Query("SELECT a FROM Auction a JOIN FETCH a.categories WHERE a = ?1")
+    Auction fetchAuctionCategories(Auction auction);
 
 }

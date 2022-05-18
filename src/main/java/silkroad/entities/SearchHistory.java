@@ -32,6 +32,6 @@ public class SearchHistory {
         this.id = id;
         this.auction = auction;
         this.user = user;
-        this.interactions = 0L;
+        this.interactions = 1L;
     }
 }

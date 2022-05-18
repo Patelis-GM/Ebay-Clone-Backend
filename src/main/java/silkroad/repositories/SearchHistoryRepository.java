@@ -18,7 +18,7 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Se
 
     @Transactional
     @Modifying
-    @Query("UPDATE SearchHistory s SET s.interactions = s.interactions + 1 WHERE s.id = ?1 and s.interactions <= 10")
-    Integer updateInteractionsById(SearchHistoryID searchHistoryID);
+    @Query("UPDATE SearchHistory s SET s.interactions = s.interactions + 1 WHERE s.id = ?1 and s.interactions < ?2")
+    Integer updateInteractionsById(SearchHistoryID searchHistoryID, Long interactionsCeiling);
 
 }

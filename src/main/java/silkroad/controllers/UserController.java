@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import silkroad.dtos.auction.response.AuctionCompleteDetails;
+import silkroad.dtos.auction.response.AuctionBasicDetails;
 import silkroad.dtos.auction.response.AuctionPurchaseDetails;
 import silkroad.dtos.bid.response.BidBuyerDetails;
 import silkroad.dtos.message.request.MessagePosting;
@@ -39,15 +39,16 @@ public class UserController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/auctions", method = RequestMethod.GET)
-    public ResponseEntity<PageResponse<AuctionCompleteDetails>> getUserPostedAuctions(Authentication authentication,
-                                                                                      @PathVariable String username,
-                                                                                      @RequestParam(name = "sold", required = false) Boolean sold,
-                                                                                      @RequestParam(name = "active", required = false) Boolean active,
-                                                                                      @RequestParam(name = "page") Integer pageIndex,
-                                                                                      @RequestParam(name = "size") Integer pageSize) {
+    public ResponseEntity<PageResponse<AuctionBasicDetails>> getUserPostedAuctions(Authentication authentication,
+                                                                                   @PathVariable String username,
+                                                                                   @RequestParam(name = "sold", required = false) Boolean sold,
+                                                                                   @RequestParam(name = "active", required = false) Boolean active,
+                                                                                   @RequestParam(name = "page") Integer pageIndex,
+                                                                                   @RequestParam(name = "size") Integer pageSize) {
         UserException.validateAuthentication(authentication, username);
         return new ResponseEntity<>(this.auctionService.getUserPostedAuctions(authentication, pageIndex - 1, pageSize, active, sold), HttpStatus.OK);
     }
+
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/users/{username}/purchases", method = RequestMethod.GET)

@@ -69,6 +69,35 @@ public class AuctionSpecificationBuilder {
         return criteriaBuilder.greaterThan(root.get(Auction_.END_DATE), TimeManager.now());
     }
 
+    public static Predicate hasMinimumPrice(Root<Auction> root, CriteriaBuilder criteriaBuilder, Double minimumPrice) {
+
+        Predicate highestBidPresent = criteriaBuilder.greaterThan(root.get(Auction_.HIGHEST_BID), 0.0);
+        Predicate highestBidInRange = criteriaBuilder.greaterThanOrEqualTo(root.get(Auction_.HIGHEST_BID), minimumPrice);
+        Predicate highestBidAboveThreshold = criteriaBuilder.and(highestBidPresent, highestBidInRange);
+
+        Predicate highestBidAbsent = criteriaBuilder.equal(root.get(Auction_.HIGHEST_BID), 0.0);
+        Predicate firstBidInRange = criteriaBuilder.greaterThanOrEqualTo(root.get(Auction_.FIRST_BID), minimumPrice);
+        Predicate firstBidAboveThreshold = criteriaBuilder.and(highestBidAbsent, firstBidInRange);
+
+        return criteriaBuilder.or(highestBidAboveThreshold, firstBidAboveThreshold);
+
+    }
+
+    public static Predicate hasMaximumPrice(Root<Auction> root, CriteriaBuilder criteriaBuilder, Double maximumPrice) {
+
+        Predicate highestBidPresent = criteriaBuilder.greaterThan(root.get(Auction_.HIGHEST_BID), 0.0);
+        Predicate highestBidInRange = criteriaBuilder.lessThanOrEqualTo(root.get(Auction_.HIGHEST_BID), maximumPrice);
+        Predicate highestBidBelowThreshold = criteriaBuilder.and(highestBidPresent, highestBidInRange);
+
+        Predicate highestBidAbsent = criteriaBuilder.equal(root.get(Auction_.HIGHEST_BID), 0.0);
+        Predicate firstBidInRange = criteriaBuilder.lessThanOrEqualTo(root.get(Auction_.FIRST_BID), maximumPrice);
+        Predicate firstBidBelowThreshold = criteriaBuilder.and(highestBidAbsent, firstBidInRange);
+
+        return criteriaBuilder.or(highestBidBelowThreshold, firstBidBelowThreshold);
+
+    }
+
+
     public static Specification<Auction> getAuctionsBrowsingSpecification(String textSearch, Double minimumPrice, Double maximumPrice, String category, String location, Boolean hasBuyPrice) {
 
         return (root, query, criteriaBuilder) -> {
@@ -76,10 +105,10 @@ public class AuctionSpecificationBuilder {
             List<Predicate> auctionPredicates = new ArrayList<>();
 
             if (minimumPrice != null)
-                auctionPredicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(Auction_.HIGHEST_BID), minimumPrice));
+                auctionPredicates.add(AuctionSpecificationBuilder.hasMinimumPrice(root, criteriaBuilder, minimumPrice));
 
             if (maximumPrice != null)
-                auctionPredicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(Auction_.HIGHEST_BID), maximumPrice));
+                auctionPredicates.add(AuctionSpecificationBuilder.hasMaximumPrice(root, criteriaBuilder, maximumPrice));
 
             if (category != null) {
                 SetJoin<Auction, Category> categorySetJoin = root.joinSet(Auction_.CATEGORIES, JoinType.INNER);
