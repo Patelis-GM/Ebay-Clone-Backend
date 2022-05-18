@@ -16,14 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `silkroad`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `silkroad` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
-
-USE `silkroad`;
-
---
 -- Table structure for table `address`
 --
 
@@ -48,7 +40,7 @@ CREATE TABLE `address` (
 
 LOCK TABLES `address` WRITE;
 /*!40000 ALTER TABLE `address` DISABLE KEYS */;
-INSERT INTO `address` VALUES (-89.2122,89.9337,'Congo','South Paoloberg','Hoeger Ferry','992','373'),(-82.5954,28.9132,'Mongolia','Schimmelchester','Fletcher Crescent','960','198'),(-80.4218,-99.309,'Republic of Korea','South Mortimerhaven','Fahey Points','261','603'),(-29.5236,-126.3965,'Tunisia','Saraiville','Raul Squares','601','1'),(-28.3861,27.2883,'Pitcairn Islands','Brentwood','Pearline Junctions','919','156'),(-28.2671,145.3656,'Estonia','Trompside','Ebert Ville','676','447'),(-9.0898,149.8206,'Ethiopia','Eden Prairie','Goodwin Tunnel','722','428'),(-6.4766,108.8964,'Norfolk Island','Port Freda','Cecile Drive','93','127'),(-2.4969,-46.0937,'Iceland','Alhambra','Katelyn Dam','847','26'),(-1.3398,155.7,'Cyprus','Tarynside','Betsy Mill','504','30'),(0.0175,-102.5948,'Israel','Lake Osbaldoshire','Rachelle Throughway','852','174'),(4.4667,-20.3616,'United Arab Emirates','Lake Owen','Leuschke Route','231','279'),(19.6371,127.1541,'Mauritius','Rosariofort','Stroman Stream','769','524'),(31.8932,-139.4988,'Azerbaijan','Botsfordton','Smith Loop','957','927'),(38.6209,101.0354,'Andorra','New Freidamouth','Mayert Grove','196','744'),(48.5993,56.1957,'Thailand','Blue Springs','Aubree Pine','800','123'),(53.9423,-157.9495,'Slovenia','Annieville','Madilyn Place','954','324'),(54.0371,-165.714,'French Southern Territories','Dakotaberg','Lockman Fords','884','135'),(63.3937,-152.7668,'Lao People\'s Democratic Republic','South Yolanda','Wilford Trafficway','579','636'),(76.5681,-12.8845,'Bosnia and Herzegovina','Marshallbury','Steuber Parkway','624','221'),(88.8195,-31.9489,'Barbados','Paterson','Renner Way','62','323');
+INSERT INTO `address` VALUES (-88.9751,31.7505,'Malaysia','Lessiebury','Botsford Tunnel','936','379'),(-68.0417,4.1718,'Norfolk Island','Lake Alyson','Murphy Circles','262','153'),(-66.8345,80.5658,'Panama','Port Jeremie','Hoppe Mission','175','756'),(-9.8841,-94.543,'Mozambique','Pollichville','Konopelski Drive','992','374'),(-6.324,133.8062,'Togo','East Bransonchester','D\'Amore Common','808','417'),(-3.8729,58.0915,'Ireland','Kalamazoo','Maurice Expressway','443','36'),(-1.4937,-21.5241,'Zimbabwe','Maggioberg','Garrett Turnpike','864','404'),(1,1,'Lithuania','Keelyshire','Linwood Estates','743','822'),(3.3731,-46.7249,'French Guiana','Cynthiahaven','Clarabelle Fork','369','824'),(8.909,-26.9957,'South Africa','Hartmannfurt','Hector Spring','490','718'),(16.3328,29.0118,'Austria','South Melyssa','Claudine Villages','41','133'),(26.7393,-164.7311,'Nicaragua','New Ransomchester','Icie Rapid','78','442'),(37.101,-109.834,'Angola','South Jessikastad','Carroll Meadows','199','583'),(41.3656,121.5107,'Japan','New Uriahfort','Leilani Light','935','157'),(49.7109,-4.0654,'Brazil','Asheville','Ozella Falls','46','141'),(50.1627,-158.2997,'Eritrea','East Damon','Larkin Junction','876','371'),(72.5833,-26.153,'Jamaica','Roswell','Gabriella Vista','721','322'),(74.3382,57.6977,'American Samoa','Lake Duncanland','Bernhard Loaf','622','576'),(84.4083,172.4377,'Nepal','Deronchester','Price Stravenue','819','203');
 /*!40000 ALTER TABLE `address` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,7 +73,7 @@ CREATE TABLE `auction` (
   CONSTRAINT `fk_Auction_Address1` FOREIGN KEY (`latitude`, `longitude`) REFERENCES `address` (`latitude`, `longitude`),
   CONSTRAINT `fk_Auction_Bid1` FOREIGN KEY (`bid_id`) REFERENCES `bid` (`id`),
   CONSTRAINT `fk_Auction_User1` FOREIGN KEY (`seller_id`) REFERENCES `user` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +82,7 @@ CREATE TABLE `auction` (
 
 LOCK TABLES `auction` WRITE;
 /*!40000 ALTER TABLE `auction` DISABLE KEYS */;
-INSERT INTO `auction` VALUES (1,'connecting','Forward upward-trending','2022-05-12 19:11:25','2022-05-16 13:02:46',1000,76,1000,2,-28.3861,27.2883,'George',1,1),(2,'input','revolutionary array dot-com','2022-05-12 19:13:26','2022-05-12 19:45:22',NULL,71,101,1,48.5993,56.1957,'Alek',0,3),(3,'mesh','Managed Identity Mission','2022-05-12 20:23:02','2022-05-16 12:02:20',NULL,71,0,0,4.4667,-20.3616,'Alek',0,NULL),(4,'empower','Sahara dynamic RSS green Chips','2022-05-12 20:23:03','2022-05-16 06:58:30',NULL,76,0,0,88.8195,-31.9489,'Alek',0,NULL),(5,'Investment','Account niches Frozen Customizable','2022-05-12 20:23:04','2022-05-19 19:24:01',NULL,92,0,0,-82.5954,28.9132,'Alek',0,NULL),(6,'Specialist','XML reintermediate','2022-05-12 20:23:41','2022-05-17 18:07:11',1000,80,2005,1,-80.4218,-99.309,'Alek',0,4),(7,'virtual','Borders Delaware','2022-05-12 20:25:06','2022-05-15 19:33:24',NULL,87,0,0,63.3937,-152.7668,'Alek',0,NULL);
+INSERT INTO `auction` VALUES (1,'Keyboard Manat EXE','Clothing Card Legacy Associate Automotive Brazilian Regional Metrics Buckinghamshire','2022-05-18 04:08:14','2022-05-22 19:49:18',262,58,2000,2,74.3382,57.6977,'Alek',0,1),(3,'Locks Alaska parse','Berkshire Chips Shoes Books Arizona intermediate hardware Avon','2022-05-18 04:09:51','2022-05-20 19:00:48',NULL,80,2000,1,16.3328,29.0118,'Alek',0,3),(4,'Tennessee grid-enabled collaborative','analyzer Savings Prairie Trail RAM Dynamic Unbranded Nevada Industrial','2022-05-18 04:13:23','2022-05-22 18:45:03',NULL,69,0,0,26.7393,-164.7311,'Boris',0,NULL),(5,'SMS Chair green','Salad New morph Brand AI','2022-05-18 04:13:34','2022-05-22 15:38:17',317,94,0,0,-68.0417,4.1718,'Boris',0,NULL),(6,'streamline pink customized','Bedfordshire multi-byte redundant HTTP architecture front-end Berkshire','2022-05-18 04:13:47','2022-05-22 15:32:26',759,85,0,0,-1.4937,-21.5241,'Boris',0,NULL);
 /*!40000 ALTER TABLE `auction` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -112,7 +104,7 @@ CREATE TABLE `bid` (
   KEY `fk_Bid_User1_idx` (`user_id`),
   CONSTRAINT `fk_Bid_User1` FOREIGN KEY (`user_id`) REFERENCES `user` (`username`),
   CONSTRAINT `fk_User_has_Auction_Auction1` FOREIGN KEY (`auction_id`) REFERENCES `auction` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -121,7 +113,7 @@ CREATE TABLE `bid` (
 
 LOCK TABLES `bid` WRITE;
 /*!40000 ALTER TABLE `bid` DISABLE KEYS */;
-INSERT INTO `bid` VALUES (1,'Alek',1,1000,'2022-05-12 19:48:59'),(2,'Boris',1,101,'2022-05-12 19:45:58'),(3,'Boris',2,101,'2022-05-12 19:51:33'),(4,'Boris',6,2005,'2022-05-12 20:30:38');
+INSERT INTO `bid` VALUES (1,'Boris',1,2000,'2022-05-18 18:35:00'),(2,'Christine',1,202,'2022-05-18 18:04:13'),(3,'Boris',3,2000,'2022-05-18 19:14:13');
 /*!40000 ALTER TABLE `bid` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,7 +136,7 @@ CREATE TABLE `category` (
 
 LOCK TABLES `category` WRITE;
 /*!40000 ALTER TABLE `category` DISABLE KEYS */;
-INSERT INTO `category` VALUES ('Appliances'),('Clothing'),('Collectibles'),('Movies'),('Music'),('Toys & Games');
+INSERT INTO `category` VALUES ('Appliances'),('Books'),('Clothing'),('Collectibles'),('Electronics'),('Movies'),('Music'),('Sports'),('Toys & Games'),('Transportation');
 /*!40000 ALTER TABLE `category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -172,7 +164,7 @@ CREATE TABLE `classification` (
 
 LOCK TABLES `classification` WRITE;
 /*!40000 ALTER TABLE `classification` DISABLE KEYS */;
-INSERT INTO `classification` VALUES (1,'Clothing'),(2,'Appliances'),(2,'Clothing'),(2,'Movies'),(2,'Music'),(3,'Appliances'),(3,'Clothing'),(3,'Movies'),(3,'Music'),(4,'Appliances'),(4,'Clothing'),(4,'Movies'),(4,'Music'),(5,'Appliances'),(5,'Clothing'),(5,'Movies'),(5,'Music'),(6,'Movies'),(7,'Movies'),(7,'Music');
+INSERT INTO `classification` VALUES (1,'Appliances'),(1,'Books'),(1,'Collectibles'),(1,'Music'),(3,'Appliances'),(3,'Collectibles'),(3,'Electronics'),(3,'Music'),(4,'Appliances'),(4,'Books'),(5,'Appliances'),(5,'Books'),(5,'Music'),(5,'Toys & Games'),(6,'Appliances'),(6,'Collectibles'),(6,'Electronics'),(6,'Music');
 /*!40000 ALTER TABLE `classification` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -198,7 +190,7 @@ CREATE TABLE `image` (
 
 LOCK TABLES `image` WRITE;
 /*!40000 ALTER TABLE `image` DISABLE KEYS */;
-INSERT INTO `image` VALUES ('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/1/Alek1.png',1),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/2/Alek1.png',2),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/2/Alek2.png',2),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/2/Alek3.png',2),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/3/Alek1.png',3),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/3/Alek2.png',3),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/3/Alek3.png',3),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/4/Alek1.png',4),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/4/Alek2.png',4),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/4/Alek3.png',4),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/5/Alek1.png',5),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/5/Alek2.png',5),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/5/Alek3.png',5),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/6/Alek1.png',6),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/6/Alek2.png',6),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/6/Alek3.png',6),('C:/Users/PLAISIO/Desktop/Web-Applications/Uploads/7/Alek3.png',7);
+INSERT INTO `image` VALUES ('Uploads/1/Alek1.png',1),('Uploads/1/Alek11.png',1),('Uploads/1/Alek111.png',1),('Uploads/3/Alek3.png',3),('Uploads/3/Alek33.png',3),('Uploads/3/Alek333.png',3),('Uploads/4/Boris1.png',4),('Uploads/4/Boris11.png',4),('Uploads/4/Boris111.png',4),('Uploads/5/Boris2.png',5),('Uploads/5/Boris22.png',5),('Uploads/6/Boris3.png',6),('Uploads/6/Boris33.png',6),('Uploads/6/Boris333.png',6);
 /*!40000 ALTER TABLE `image` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -214,15 +206,15 @@ CREATE TABLE `message` (
   `title` text NOT NULL,
   `body` longtext NOT NULL,
   `creation_date` datetime NOT NULL,
-  `is_read` tinyint NOT NULL DEFAULT '0',
   `sender` varchar(45) NOT NULL,
   `recipient` varchar(45) NOT NULL,
+  `is_read` tinyint NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_Message_User1_idx` (`sender`),
   KEY `fk_Message_User2_idx` (`recipient`),
   CONSTRAINT `fk_Message_User1` FOREIGN KEY (`sender`) REFERENCES `user` (`username`),
   CONSTRAINT `fk_Message_User2` FOREIGN KEY (`recipient`) REFERENCES `user` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -231,7 +223,7 @@ CREATE TABLE `message` (
 
 LOCK TABLES `message` WRITE;
 /*!40000 ALTER TABLE `message` DISABLE KEYS */;
-INSERT INTO `message` VALUES (1,'Hello','Hi from Alek','2022-05-12 19:59:06',0,'Alek','Boris'),(2,'Hello2','Hi from Alek','2022-05-12 20:04:26',1,'Alek','Boris'),(3,'Hello3','Hi from Alek','2022-05-12 20:04:31',0,'Alek','Boris');
+INSERT INTO `message` VALUES (1,'Hello','Hi from Alek','2022-05-18 18:38:03','Alek','Boris',1);
 /*!40000 ALTER TABLE `message` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -259,7 +251,7 @@ CREATE TABLE `messageaccess` (
 
 LOCK TABLES `messageaccess` WRITE;
 /*!40000 ALTER TABLE `messageaccess` DISABLE KEYS */;
-INSERT INTO `messageaccess` VALUES ('Boris',2),('Alek',3),('Boris',3);
+INSERT INTO `messageaccess` VALUES ('Alek',1);
 /*!40000 ALTER TABLE `messageaccess` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -296,6 +288,7 @@ DROP TABLE IF EXISTS `searchhistory`;
 CREATE TABLE `searchhistory` (
   `auction_id` bigint unsigned NOT NULL,
   `user_id` varchar(45) NOT NULL,
+  `interactions` bigint unsigned NOT NULL,
   PRIMARY KEY (`auction_id`,`user_id`),
   KEY `fk_User_has_Auction_Auction2_idx` (`auction_id`),
   KEY `fk_SearchHistory_User1_idx` (`user_id`),
@@ -310,7 +303,7 @@ CREATE TABLE `searchhistory` (
 
 LOCK TABLES `searchhistory` WRITE;
 /*!40000 ALTER TABLE `searchhistory` DISABLE KEYS */;
-INSERT INTO `searchhistory` VALUES (1,'Alek'),(1,'Boris'),(1,'George'),(2,'Boris'),(4,'George'),(6,'Boris'),(6,'George'),(7,'Alek'),(7,'George');
+INSERT INTO `searchhistory` VALUES (1,'Boris',6),(1,'Christine',1),(3,'Boris',1),(4,'Alek',10);
 /*!40000 ALTER TABLE `searchhistory` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -352,7 +345,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES ('Alek','$2a$04$Ny6MtjDc.AkP3VZU71pjheYComIG2pL0Dhc5ks.IjVgVZ9rLrN3WC','Carleton64@yahoo.com','Meda','Mohr','568-773-4053','XXXXXX',0,0,1,'USER',-1.3398,155.7,'2022-05-12 16:15:20'),('Boris','$2a$04$F/fkTIn.Ja9uCnnm98E9Ee4rNGtHC8zXdOODzZHrpL.0Zt0tiQyvG','Carlo_Champlin@yahoo.com','Carol','Bernier','759-781-3552','XXXXXX',0,0,1,'USER',-9.0898,149.8206,'2022-05-12 16:15:26'),('Christine','$2a$04$wa3mu1n61KzYB37zXlapzeCkT5Nuq9Hqt8h42qw.z6nPTRqF/YsrG','Ebony.Gibson@yahoo.com','Mable','Hickle','486-373-7836','XXXXXX',0,0,1,'USER',19.6371,127.1541,'2022-05-12 16:15:32'),('Dan','$2a$04$QeZ1KWahBCLto1FDcPwFjuypfaCrC31EgOfUpkj5UmD.Yr5E25OZa','Gerhard_Considine12@hotmail.com','Martine','Ankunding','835-477-0505','XXXXXX',0,0,0,'USER',-89.2122,89.9337,'2022-05-12 16:15:38'),('George','$2a$04$sTAYVehKlpcPWS/mEsP2iuka2ALfiQBJOQHDX714mdlu0bHMfVaGu','Jamaal_Altenwerth14@gmail.com','Elmira','Dare','601-467-1199','XXXXXX',0,0,1,'ADMIN',-28.2671,145.3656,'2022-05-12 16:15:53'),('Xin','$2a$04$lPNQq66Ai4NSNOZwpc73f.drLBBnZnX0tgNN5rFvIRj36KK.SCMwa','Cordelia_Ortiz11@hotmail.com','Geovanny','Kling','808-684-0793','XXXXXX',0,0,1,'USER',76.5681,-12.8845,'2022-05-12 19:21:04');
+INSERT INTO `user` VALUES ('Alek','$2a$04$30iugFQu0.g10cBFKJcyoObXnyz06YrcS/XUBywjvqLcAwg3acdg2','Katlyn.Turcotte92@hotmail.com','Khalil','Kuvalis','207-922-4602','XXXXXX',0,0,1,'USER',1,1,'2022-05-18 03:03:55'),('Boris','$2a$04$xpntmL/h8ixlpaL/ul0pmum6zye74ds3GLHA7EeU2g8QDULKTHQ3O','Felicita.Kassulke@yahoo.com','Matilde','Volkman','209-219-9348','XXXXXX',0,0,1,'USER',1,1,'2022-05-18 03:04:04'),('Christine','$2a$04$loMNTz86DEzPk9XgFD/6M.Zic9QMD4OmUcMHMIbsNu..UPYfekF4a','Bobbie_Powlowski@yahoo.com','Aliya','Pollich','524-770-6515','XXXXXX',0,0,1,'USER',72.5833,-26.153,'2022-05-18 03:16:42'),('Dan','$2a$04$xUYrHcTVu7NTb304Pz97tOFyq9HaVSjsM4QZetZumuAVahzFL2yvu','Velma.Gaylord@hotmail.com','Mabelle','Kassulke','256-349-8573','XXXXXX',0,0,0,'USER',8.909,-26.9957,'2022-05-18 03:16:33'),('George','$2a$04$ynGp7vdKMqAN0.wcbQxo0eRPQeyKjoxyCceM5oz6DjMpEzJMm4Ng2','Makayla_Ritchie@gmail.com','Justina','Kilback','315-973-8538','XXXXXX',0,0,1,'ADMIN',37.101,-109.834,'2022-05-18 03:03:33');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -365,4 +358,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-05-12 21:02:32
+-- Dump completed on 2022-05-18 19:30:22
