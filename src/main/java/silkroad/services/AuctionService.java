@@ -154,7 +154,7 @@ public class AuctionService {
 
         Auction auction = optionalAuction.get();
 
-        if (authentication != null)
+        if (authentication != null && !Objects.equals(authentication.getName(), auction.getSeller().getUsername()))
             this.searchHistoryService.recordUserInteraction(this.userRepository.getById(authentication.getName()), auction);
 
         return this.auctionMapper.toAuctionBrowsingCompleteDetails(auction);
