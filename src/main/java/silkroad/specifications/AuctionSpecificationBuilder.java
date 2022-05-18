@@ -189,7 +189,10 @@ public class AuctionSpecificationBuilder {
 
 
     public static Specification<Auction> getExportAuctionsSpecification(Date from, Date to) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.between(root.get(Auction_.START_DATE), from, to);
+        return (root, query, criteriaBuilder) -> criteriaBuilder.and(
+                criteriaBuilder.greaterThanOrEqualTo(root.get(Auction_.START_DATE), from),
+                criteriaBuilder.lessThanOrEqualTo(root.get(Auction_.START_DATE), to)
+        );
     }
 
 }

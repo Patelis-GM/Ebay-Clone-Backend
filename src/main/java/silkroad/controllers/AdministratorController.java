@@ -48,6 +48,7 @@ public class AdministratorController {
     public ResponseEntity<InputStreamResource> exportAuctions(@RequestParam(name = "json") Boolean asJSON,
                                                               @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss") Date from,
                                                               @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss") Date to) throws IOException {
+
         return this.auctionService.exportAuctions(asJSON, from, to);
     }
 
