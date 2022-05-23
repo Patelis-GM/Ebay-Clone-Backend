@@ -14,6 +14,7 @@ import silkroad.repositories.ImageRepository;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -101,4 +102,17 @@ public class ImageService {
         }
     }
 
+    public byte[] getImage(Long auctionID, String fileName) {
+        String filePath = this.uploadsDirectory + auctionID + "/" + fileName;
+        File file = new File(filePath);
+        if (!file.exists())
+            return null;
+        else {
+            try {
+                return Files.readAllBytes(file.toPath());
+            } catch (IOException e) {
+                throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_RETRIEVAL_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
 }

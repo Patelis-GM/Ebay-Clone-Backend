@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import silkroad.dtos.user.request.UserSecurityDetails;
 import silkroad.entities.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,6 +31,11 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     @Modifying
     @Query("UPDATE User u SET u.approved = ?2 WHERE u.username = ?1")
     Integer updateApprovalStatusByUsername(String username, Boolean approvalStatus);
+
+
+    @Query("SELECT u.username FROM User u WHERE u.approved = TRUE ORDER BY u.username ASC")
+    List<String> findSortedUsernames();
+
 
 
 }

@@ -7,6 +7,7 @@ import silkroad.entities.Category;
 import silkroad.entities.Image;
 import silkroad.utilities.TimeManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,7 +43,6 @@ public interface AuctionMapper {
     List<AuctionBasicDetails> toAuctionBasicDetailsList(List<Auction> auctions);
 
 
-
     /* As Everyone */
     @Mapping(target = "sellerRating", source = "seller.sellerRating")
     @Mapping(target = "seller", source = "seller.username")
@@ -53,8 +53,18 @@ public interface AuctionMapper {
 
 
     default List<String> mapImages(List<Image> images) {
-        return images.stream().map(Image::getPath).collect(Collectors.toList());
+
+        final String SLASH = "/";
+
+        List<String> imageList = new ArrayList<>();
+        for (Image image : images) {
+            String filename = image.getPath().substring(image.getPath().lastIndexOf(SLASH) + 1);
+            imageList.add(filename);
+        }
+
+        return imageList;
     }
+
 
     default List<String> mapCategories(Set<Category> categories) {
         return categories.stream().map(Category::getName).collect(Collectors.toList());

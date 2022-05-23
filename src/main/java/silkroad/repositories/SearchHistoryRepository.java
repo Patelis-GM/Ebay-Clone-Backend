@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import silkroad.entities.SearchHistory;
 import silkroad.entities.SearchHistoryID;
 
+import java.util.List;
+
 @Repository
 public interface SearchHistoryRepository extends JpaRepository<SearchHistory, SearchHistoryID> {
 
@@ -21,4 +23,6 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Se
     @Query("UPDATE SearchHistory s SET s.interactions = s.interactions + 1 WHERE s.id = ?1 and s.interactions < ?2")
     Integer updateInteractionsById(SearchHistoryID searchHistoryID, Long interactionsCeiling);
 
+    @Query("SELECT s FROM SearchHistory s WHERE s.id.auctionId IN ?1")
+    List<SearchHistory> findAllByAuctionId(List<Long> sortedAuctions);
 }

@@ -33,7 +33,7 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
         CriteriaQuery<Long> countQuery = getCountQuery(criteriaBuilder, specification);
         Long count = entityManager.createQuery(countQuery).getSingleResult();
 
-        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a LEFT JOIN FETCH a.latestBid JOIN FETCH a.images WHERE a.id in :ids", Auction.class);
+        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a LEFT JOIN FETCH a.latestBid JOIN FETCH a.images WHERE a.id IN :ids", Auction.class);
         typedQuery.setParameter("ids", ids);
         typedQuery.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
         List<Auction> auctions = typedQuery.getResultList();
@@ -51,7 +51,7 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
         CriteriaQuery<Long> countQuery = getCountQuery(criteriaBuilder, specification);
         Long count = entityManager.createQuery(countQuery).getSingleResult();
 
-        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id in :ids", Auction.class);
+        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id IN :ids", Auction.class);
         typedQuery.setParameter("ids", ids);
         typedQuery.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
         List<Auction> auctions = typedQuery.getResultList();
@@ -69,7 +69,7 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
         CriteriaQuery<Long> countQuery = getCountQuery(criteriaBuilder, specification);
         Long count = entityManager.createQuery(countQuery).getSingleResult();
 
-        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.images JOIN FETCH a.latestBid WHERE a.id in :ids", Auction.class);
+        TypedQuery<Auction> typedQuery = entityManager.createQuery("SELECT DISTINCT a FROM Auction a JOIN FETCH a.images JOIN FETCH a.latestBid WHERE a.id IN :ids", Auction.class);
         typedQuery.setParameter("ids", ids);
         typedQuery.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
         List<Auction> auctions = typedQuery.getResultList();

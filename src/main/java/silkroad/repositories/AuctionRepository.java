@@ -8,6 +8,7 @@ import silkroad.entities.Auction;
 
 import javax.persistence.LockModeType;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -40,5 +41,14 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
 
     @Query("SELECT a FROM Auction a JOIN FETCH a.categories WHERE a = ?1")
     Auction fetchAuctionCategories(Auction auction);
+
+    @Query("SELECT a.id FROM Auction a WHERE a.endDate > ?1 AND " +
+            "((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))" +
+            "ORDER BY a.id asc")
+    List<Long> findSortedIds(Date now);
+
+    @Query("SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id IN ?1")
+    List<Auction> findRecommendationsByIds(List<Long> ids);
+
 
 }

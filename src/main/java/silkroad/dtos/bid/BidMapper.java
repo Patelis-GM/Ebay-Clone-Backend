@@ -6,6 +6,7 @@ import silkroad.dtos.bid.response.BidSellerDetails;
 import silkroad.entities.Bid;
 import silkroad.entities.Image;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,16 @@ public interface BidMapper {
 
 
     default List<String> mapImages(List<Image> images) {
-        return images.stream().map(Image::getPath).collect(Collectors.toList());
+
+        final String SLASH = "/";
+
+        List<String> imageList = new ArrayList<>();
+        for (Image image : images) {
+            String filename = image.getPath().substring(image.getPath().lastIndexOf(SLASH) + 1);
+            imageList.add(filename);
+        }
+
+        return imageList;
     }
 
 
