@@ -16,8 +16,8 @@ public class RecommendationMatrix {
     private final Logger logger = LoggerFactory.getLogger(RecommendationMatrix.class);
 
     private final double learningRate = 0.001;
-    private final double regularizationPenalty = 0.09;
-    private final int latentFeatures = 4;
+    private final double regularizationPenalty = 0.08;
+    private final int latentFeatures = 2;
     private final int epochs = 2048;
     private final int patience = 2;
 
@@ -26,7 +26,6 @@ public class RecommendationMatrix {
         this.auctions = new HashMap<>();
         this.users = new HashMap<>();
     }
-
 
     public List<Long> recommend(Authentication authentication, Integer maximumRecommendations) {
 
@@ -94,12 +93,10 @@ public class RecommendationMatrix {
 
         logger.info("Total Users : " + totalUsers);
         logger.info("Total Auctions : " + totalAuctions);
-        logger.info("Users : " + userMap);
-        logger.info("Auctions : " + auctionMap);
+
 
         double[][] matrix = new double[totalUsers][totalAuctions];
         for (SearchHistory record : searchHistoryRecords) {
-            System.out.println(record.getId());
             String username = record.getId().getUserId();
             Long auction = record.getId().getAuctionId();
             double interactions = (double) record.getInteractions();
@@ -120,6 +117,7 @@ public class RecommendationMatrix {
 
             iterations++;
 
+            logger.info(String.valueOf(iterations));
 
             for (int i = 0; i < totalUsers; i++)
                 for (int j = 0; j < totalAuctions; j++)
@@ -166,7 +164,9 @@ public class RecommendationMatrix {
                 validationRMSE /= validationSetCardinality;
                 validationRMSE = Math.sqrt(validationRMSE);
 
-                if (validationRMSE < previousValidationRMSE) {
+                logger.info(String.valueOf(validationRMSE));
+
+                if (validationRMSE < previousValidationRMSE && Math.abs(validationRMSE - previousValidationRMSE) > 0.00001) {
                     previousValidationRMSE = validationRMSE;
                     outOfPatience = 0;
                 } else
@@ -184,8 +184,7 @@ public class RecommendationMatrix {
         this.auctions = auctionMap;
         this.users = userMap;
 
-        logger.info(MatrixUtilities.toString(matrix, totalUsers, totalAuctions));
-        logger.info(MatrixUtilities.toString(recommendationMatrix, totalUsers, totalAuctions));
+
         logger.info("Total iterations : " + iterations);
     }
 

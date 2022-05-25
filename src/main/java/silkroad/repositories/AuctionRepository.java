@@ -1,5 +1,6 @@
 package silkroad.repositories;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,12 +44,10 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
     Auction fetchAuctionCategories(Auction auction);
 
     @Query("SELECT a.id FROM Auction a WHERE a.endDate > ?1 AND " +
-            "((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))" +
-            "ORDER BY a.id asc")
-    List<Long> findSortedIds(Date now);
+            "((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))")
+    List<Long> findNotExpiredIds(Date now, Pageable pageable);
 
     @Query("SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id IN ?1")
     List<Auction> findRecommendationsByIds(List<Long> ids);
-
 
 }

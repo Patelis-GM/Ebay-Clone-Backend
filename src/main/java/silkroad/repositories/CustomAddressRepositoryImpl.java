@@ -1,22 +1,23 @@
 package silkroad.repositories;
 
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import silkroad.entities.Address;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 
-@Repository
-public class GeneralPurposeRepository<T, ID> {
+public class CustomAddressRepositoryImpl implements CustomAddressRepository {
 
     @PersistenceContext
     EntityManager entityManager;
 
+    @Override
     @Transactional
-    public T persist(T entity) throws PersistenceException {
-        entityManager.persist(entity);
+    public Address persist(Address address) throws PersistenceException {
+        entityManager.persist(address);
         entityManager.flush();
-        return entity;
+        return address;
     }
+
 }

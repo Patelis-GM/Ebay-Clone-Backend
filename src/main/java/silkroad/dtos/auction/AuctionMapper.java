@@ -56,11 +56,16 @@ public interface AuctionMapper {
 
         final String SLASH = "/";
 
+        long time = System.currentTimeMillis();
+
         List<String> imageList = new ArrayList<>();
         for (Image image : images) {
             String filename = image.getPath().substring(image.getPath().lastIndexOf(SLASH) + 1);
             imageList.add(filename);
         }
+
+
+
 
         return imageList;
     }
