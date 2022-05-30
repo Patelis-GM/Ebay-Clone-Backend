@@ -121,8 +121,8 @@ public class AuctionSpecificationBuilder {
             }
 
             if (textSearch != null) {
-                Predicate nameSearch = criteriaBuilder.like(root.get(Auction_.NAME), textSearch + "%");
-                Predicate descriptionSearch = criteriaBuilder.like(root.get(Auction_.DESCRIPTION), textSearch + "%");
+                Predicate nameSearch = criteriaBuilder.like(criteriaBuilder.lower(root.get(Auction_.NAME)), "%" + textSearch.toLowerCase() + "%");
+                Predicate descriptionSearch = criteriaBuilder.like(criteriaBuilder.lower(root.get(Auction_.DESCRIPTION)), "%" + textSearch.toLowerCase() + "%");
                 auctionPredicates.add(criteriaBuilder.or(nameSearch, descriptionSearch));
             }
 
