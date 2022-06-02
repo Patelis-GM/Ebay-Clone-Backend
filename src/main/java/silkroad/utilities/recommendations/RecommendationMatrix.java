@@ -16,10 +16,11 @@ public class RecommendationMatrix {
     private final Logger logger = LoggerFactory.getLogger(RecommendationMatrix.class);
 
     private final double learningRate = 0.001;
-    private final double regularizationPenalty = 0.08;
-    private final int latentFeatures = 2;
+    private final double regularizationPenalty = 0.09
+            ;
+    private final int latentFeatures = 3;
     private final int epochs = 2048;
-    private final int patience = 2;
+    private final int patience = 1;
 
     public RecommendationMatrix() {
         this.recommendationMatrix = null;
