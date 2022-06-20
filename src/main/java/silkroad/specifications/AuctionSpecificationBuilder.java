@@ -117,7 +117,9 @@ public class AuctionSpecificationBuilder {
 
             if (location != null) {
                 Join<Auction, Address> addressJoin = root.join(Auction_.ADDRESS, JoinType.INNER);
-                addressJoin.on(criteriaBuilder.or(criteriaBuilder.like(addressJoin.get(Address_.COUNTRY), location + "%"), criteriaBuilder.like(addressJoin.get(Address_.LOCATION), location + "%")));
+                addressJoin.on(criteriaBuilder.or(criteriaBuilder.like(
+                                criteriaBuilder.lower(addressJoin.get(Address_.COUNTRY)), "%" + location.toLowerCase() + "%"),
+                        criteriaBuilder.like(criteriaBuilder.lower(addressJoin.get(Address_.LOCATION)), "%" + location.toLowerCase() + "%")));
             }
 
             if (textSearch != null) {
