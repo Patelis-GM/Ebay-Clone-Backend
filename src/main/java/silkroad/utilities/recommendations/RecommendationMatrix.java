@@ -16,9 +16,8 @@ public class RecommendationMatrix {
     private final Logger logger = LoggerFactory.getLogger(RecommendationMatrix.class);
 
     private final double learningRate = 0.001;
-    private final double regularizationPenalty = 0.09;
-    private final int latentFeatures = 3;
-    private final int epochs = 2048;
+    private final double regularizationPenalty = 0.08;
+    private final int latentFeatures = 2;
     private final int patience = 1;
 
     public RecommendationMatrix() {
@@ -70,6 +69,11 @@ public class RecommendationMatrix {
 
     public void factorize(List<String> sortedUsers, List<Long> sortedAuctions, List<SearchHistory> searchHistoryRecords) {
 
+        System.out.println("In here");
+        System.out.println(sortedUsers);
+        System.out.println(sortedAuctions);
+        System.out.println(searchHistoryRecords);
+
         if (sortedUsers.isEmpty() || sortedAuctions.isEmpty() || searchHistoryRecords.isEmpty())
             return;
 
@@ -113,7 +117,7 @@ public class RecommendationMatrix {
         int iterations = 0;
         int outOfPatience = 0;
 
-        for (int epoch = 0; epoch < this.epochs; epoch++) {
+        while (true){
 
             iterations++;
 
@@ -144,8 +148,11 @@ public class RecommendationMatrix {
             double validationRMSE = 0.0;
             double validationSetCardinality = 0.0;
 
+            double trainRMSE = 0.0;
+            double trainSetCardinality = 0.0;
+
             for (int i = 0; i < totalUsers; i++)
-                for (int j = 0; j < totalAuctions; j++)
+                for (int j = 0; j < totalAuctions; j++){
                     if (isInValidationSet(i, j, totalUsers, totalAuctions) && matrix[i][j] > 0.0) {
 
                         double[] predictionRow = MatrixUtilities.getRow(V, i);
@@ -158,13 +165,33 @@ public class RecommendationMatrix {
                         validationSetCardinality += 1.0;
                     }
 
+                    if (!isInValidationSet(i, j, totalUsers, totalAuctions) && matrix[i][j] > 0.0) {
+
+                        double[] predictionRow = MatrixUtilities.getRow(V, i);
+                        double[] predictionColumn = MatrixUtilities.getColumn(F, j);
+
+                        double prediction = MatrixUtilities.makePrediction(predictionRow, predictionColumn);
+                        double eij = matrix[i][j] - prediction;
+
+                        trainRMSE += Math.pow(eij, 2.0);
+                        trainSetCardinality += 1.0;
+                    }
+
+
+                }
+
+
 
             if (validationSetCardinality > 0.0 && validationRMSE > 0.0) {
 
                 validationRMSE /= validationSetCardinality;
                 validationRMSE = Math.sqrt(validationRMSE);
 
+                trainRMSE /= trainSetCardinality;
+                trainRMSE = Math.sqrt(trainRMSE);
+
                 logger.info(String.valueOf(validationRMSE));
+                logger.info(String.valueOf(trainRMSE));
 
                 if (validationRMSE < previousValidationRMSE && Math.abs(validationRMSE - previousValidationRMSE) > 0.00001) {
                     previousValidationRMSE = validationRMSE;

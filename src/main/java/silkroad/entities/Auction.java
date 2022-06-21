@@ -14,11 +14,6 @@ import java.util.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@NamedQueries({
-        @NamedQuery(name = "Auction.findAllByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id in :ids"),
-        @NamedQuery(name = "Auction.findUserAuctionsByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images JOIN FETCH a.categories LEFT JOIN FETCH a.latestBid WHERE a.id in :ids"),
-        @NamedQuery(name = "Auction.findUserPurchasesByCriteria", query = "SELECT DISTINCT a FROM Auction a JOIN FETCH a.images JOIN FETCH a.latestBid WHERE a.id in :ids")
-})
 public class Auction {
 
 

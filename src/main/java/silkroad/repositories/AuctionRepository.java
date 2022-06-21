@@ -43,8 +43,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
     @Query("SELECT a FROM Auction a JOIN FETCH a.categories WHERE a = ?1")
     Auction fetchAuctionCategories(Auction auction);
 
-    @Query("SELECT a.id FROM Auction a WHERE a.endDate > ?1 AND " +
-            "((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))")
+    @Query("SELECT a.id FROM Auction a WHERE a.endDate > ?1 AND ((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))")
     List<Long> findNotExpiredIds(Date now, Pageable pageable);
 
     @Query("SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id IN ?1")

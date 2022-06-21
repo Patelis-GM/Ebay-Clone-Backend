@@ -44,7 +44,6 @@ public class Message {
     @JoinColumn(name = "recipient", nullable = false)
     private User recipient;
 
-
     public Message(String title, String body, User sender, User recipient) {
         this.title = title;
         this.body = body;

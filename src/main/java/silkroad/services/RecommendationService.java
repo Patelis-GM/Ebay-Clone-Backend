@@ -37,7 +37,6 @@ public class RecommendationService {
         this.auctionMapper = auctionMapper;
     }
 
-
     public List<AuctionBrowsingDetails> recommend(Authentication authentication) {
         final Integer maximumRecommendations = 5;
         List<Long> recommendations = this.recommendationMatrix.recommend(authentication, maximumRecommendations);
@@ -48,7 +47,7 @@ public class RecommendationService {
     @Scheduled(timeUnit = TimeUnit.SECONDS, fixedDelay = 7200)
     public void factorize() {
         List<String> sortedUsers = this.userRepository.findSortedUsernames();
-        final Integer maxAuctions = 100;
+        final Integer maxAuctions = 150;
         PageRequest pageRequest = PageRequest.of(0, maxAuctions, Sort.by(Auction_.ID).ascending());
         List<Long> sortedAuctions = this.auctionRepository.findNotExpiredIds(TimeManager.now(),pageRequest);
         List<SearchHistory> searchHistoryRecords = this.searchHistoryRepository.findAllByAuctionId(sortedAuctions);
