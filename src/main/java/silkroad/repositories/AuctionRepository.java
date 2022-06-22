@@ -16,11 +16,7 @@ import java.util.Optional;
 public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomAuctionRepository {
 
     @Transactional
-    @Query("SELECT a FROM Auction a WHERE " +
-            "a.id = ?1 AND " +
-            "?2 < a.endDate AND " +
-            "a.version = ?3 AND " +
-            "((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))")
+    @Query("SELECT a FROM Auction a WHERE a.id = ?1 AND ?2 < a.endDate AND a.version = ?3 AND ((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Auction> findBiddableById(Long auctionID, Date now, Long version);
 
@@ -46,7 +42,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomA
     @Query("SELECT a.id FROM Auction a WHERE a.endDate > ?1 AND ((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))")
     List<Long> findNotExpiredIds(Date now, Pageable pageable);
 
-    @Query("SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.id IN ?1")
-    List<Auction> findRecommendationsByIds(List<Long> ids);
+    @Query("SELECT DISTINCT a FROM Auction a JOIN FETCH a.address JOIN FETCH a.images WHERE a.endDate > ?2 AND ((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice)) AND a.id IN ?1")
+    List<Auction> findRecommendationsByIds(List<Long> ids, Date now);
 
 }

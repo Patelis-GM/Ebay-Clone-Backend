@@ -55,8 +55,6 @@ public class AuctionService {
     @Transactional
     public void createAuction(Authentication authentication, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
-        if (multipartFiles.length == 0)
-            throw new AuctionException(AuctionException.AUCTION_NO_MEDIA, HttpStatus.BAD_REQUEST);
 
         Set<Category> auctionCategories = this.categoryRepository.findAllDistinct(auctionDTO.getCategories());
 
@@ -75,6 +73,7 @@ public class AuctionService {
         this.auctionRepository.save(auction);
 
         this.imageService.uploadImages(auction, multipartFiles);
+
     }
 
     @Transactional
@@ -82,9 +81,6 @@ public class AuctionService {
 
         if (!this.auctionRepository.existsById(auctionID))
             throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
-
-        if (multipartFiles.length == 0)
-            throw new AuctionException(AuctionException.AUCTION_NO_MEDIA, HttpStatus.BAD_REQUEST);
 
         if (!this.auctionRepository.findAuctionSellerById(auctionID).equals(authentication.getName()))
             throw new UserException(UserException.USER_ACTION_FORBIDDEN, HttpStatus.FORBIDDEN);

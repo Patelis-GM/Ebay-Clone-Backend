@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,45 +24,60 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ImageService {
 
-    private final String uploadsDirectory = "Uploads/";
+    private final String UPLOADS_DIRECTORY = "Uploads/";
+    private final String PLACEHOLDER_IMAGE_PATH = "src/main/resources/PlaceholderImage.png";
     private final ImageRepository imageRepository;
 
     @Transactional
     public void uploadImages(Auction auction, MultipartFile[] multipartFiles) {
 
-        File uploadsDirectory = new File(this.uploadsDirectory);
+        File uploadsDirectory = new File(this.UPLOADS_DIRECTORY);
 
         if (!uploadsDirectory.exists())
             uploadsDirectory.mkdir();
 
-        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "/");
+        File auctionDirectory = new File(this.UPLOADS_DIRECTORY + auction.getId() + "/");
 
         if (!auctionDirectory.exists())
             auctionDirectory.mkdir();
 
         List<Image> auctionImages = new ArrayList<>();
 
-        for (MultipartFile multipartFile : multipartFiles) {
+        if (multipartFiles != null)
+            for (MultipartFile multipartFile : multipartFiles) {
 
-            String fileName = multipartFile.getOriginalFilename();
-            String filePath = this.uploadsDirectory + auction.getId() + "/" + fileName;
+                String fileName = multipartFile.getOriginalFilename();
+                String filePath = this.UPLOADS_DIRECTORY + auction.getId() + "/" + fileName;
 
-            File file = new File(filePath);
+                File file = new File(filePath);
 
-            try {
-                if (file.createNewFile()) {
+                try {
+                    if (file.createNewFile()) {
 
-                    try {
+                        try {
 
-                        FileOutputStream fileOutputStream = new FileOutputStream(file);
-                        fileOutputStream.write(multipartFile.getBytes());
-                        fileOutputStream.close();
-                        auctionImages.add(new Image(filePath, auction));
+                            FileOutputStream fileOutputStream = new FileOutputStream(file);
+                            fileOutputStream.write(multipartFile.getBytes());
+                            fileOutputStream.close();
+                            auctionImages.add(new Image(filePath, auction));
 
-                    } catch (IOException e) {
-                        throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_UPLOAD_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
+                        } catch (IOException e) {
+                            throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_UPLOAD_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
+                        }
                     }
+                } catch (IOException e) {
+                    throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_UPLOAD_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
                 }
+            }
+
+        else {
+            File multipartFile = new File(PLACEHOLDER_IMAGE_PATH);
+            String fileName = multipartFile.getName();
+            String filePath = this.UPLOADS_DIRECTORY + auction.getId() + "/" + fileName;
+            File auctionFile = new File(filePath);
+            try {
+                Files.copy(multipartFile.toPath(), auctionFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                auctionImages.add(new Image(filePath, auction));
             } catch (IOException e) {
                 throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_UPLOAD_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -73,12 +89,14 @@ public class ImageService {
     @Transactional
     public void updateImages(Auction auction, MultipartFile[] multipartFiles) {
 
-        File auctionDirectory = new File(this.uploadsDirectory + auction.getId() + "/");
+        File auctionDirectory = new File(this.UPLOADS_DIRECTORY + auction.getId() + "/");
 
-        for (File file : Objects.requireNonNull(auctionDirectory.listFiles()))
-            file.delete();
+        if (auctionDirectory.exists()) {
+            for (File file : Objects.requireNonNull(auctionDirectory.listFiles()))
+                file.delete();
 
-        this.imageRepository.deleteByAuction(auction.getId());
+            this.imageRepository.deleteByAuction(auction.getId());
+        }
 
         this.uploadImages(auction, multipartFiles);
     }
@@ -91,19 +109,21 @@ public class ImageService {
 
         else {
 
-            File auctionDirectory = new File(this.uploadsDirectory + auctionID + "/");
+            File auctionDirectory = new File(this.UPLOADS_DIRECTORY + auctionID + "/");
 
-            try {
-                FileUtils.deleteDirectory(auctionDirectory);
+            if (auctionDirectory.exists())
+                try {
+                    FileUtils.deleteDirectory(auctionDirectory);
 
-            } catch (IOException e) {
-                throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_DELETION_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+                } catch (IOException e) {
+                    throw new InternalServerErrorException(e.getMessage(), InternalServerErrorException.MEDIA_DELETION_FAILURE, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
         }
     }
 
     public byte[] getImage(Long auctionID, String fileName) {
-        String filePath = this.uploadsDirectory + auctionID + "/" + fileName;
+
+        String filePath = this.UPLOADS_DIRECTORY + auctionID + "/" + fileName;
         File file = new File(filePath);
         if (!file.exists())
             return null;

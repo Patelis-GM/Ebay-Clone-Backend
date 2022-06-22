@@ -12,7 +12,6 @@ import silkroad.dtos.auction.response.AuctionCompleteDetails;
 import silkroad.dtos.bid.request.BidPosting;
 import silkroad.dtos.bid.response.BidSellerDetails;
 import silkroad.dtos.page.PageResponse;
-import silkroad.dtos.user.request.Username;
 import silkroad.entities.Address;
 import silkroad.services.AddressService;
 import silkroad.services.AuctionService;
@@ -30,7 +29,7 @@ public class AuctionController {
     /* Create Auction */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions", method = RequestMethod.POST)
-    public ResponseEntity<Void> createAuction(Authentication authentication, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
+    public ResponseEntity<Void> createAuction(Authentication authentication, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images", required = false) MultipartFile[] multipartFiles) {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
         this.auctionService.createAuction(authentication, auctionDTO, multipartFiles);
@@ -40,7 +39,7 @@ public class AuctionController {
     /* Update Auction */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}", method = RequestMethod.PUT)
-    public ResponseEntity<Void> updateAuction(Authentication authentication, @PathVariable Long auctionID, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images") MultipartFile[] multipartFiles) {
+    public ResponseEntity<Void> updateAuction(Authentication authentication, @PathVariable Long auctionID, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images", required = false) MultipartFile[] multipartFiles) {
         Address address = this.addressService.createOrFindAddress(auctionDTO.getAddress());
         auctionDTO.setAddress(address);
         this.auctionService.updateAuction(authentication, auctionID, auctionDTO, multipartFiles);
