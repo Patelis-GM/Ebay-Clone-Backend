@@ -8,6 +8,5 @@ import java.io.Serializable;
 public class BidPosting implements Serializable {
 
     private final Long version;
-
     private final Double amount;
 }

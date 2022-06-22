@@ -19,7 +19,7 @@ public class JWTUtilities {
     private static final String JWT_ISSUER = "SilkRoad";
     private static final String JWT_SECRET = "c0e6e95bf492c34cf00d26d689499975aa02426c7da37844502778b3cee6d709";
     private static final long JWT_DURATION = 30000000L;
-    public static final String AUTHORIZATION_HEADER_PREFIX = "Bearer ";
+    private static final String AUTHORIZATION_HEADER_PREFIX = "Bearer ";
     private static final String JWT_ROLE_CLAIM_KEY = "Role";
 
     public static DecodedJWT verifyJWT(HttpServletRequest request) {

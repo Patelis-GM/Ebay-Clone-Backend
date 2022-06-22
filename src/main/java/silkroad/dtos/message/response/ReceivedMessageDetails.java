@@ -9,16 +9,10 @@ import java.util.Date;
 public class ReceivedMessageDetails implements Serializable {
 
     private final Long id;
-
     private final String title;
-
     private final String body;
-
     private final Date creationDate;
-
     private final Boolean read;
-
     private final String sender;
-
     private final String recipient;
 }

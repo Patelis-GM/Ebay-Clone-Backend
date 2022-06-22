@@ -69,11 +69,6 @@ public class RecommendationMatrix {
 
     public void factorize(List<String> sortedUsers, List<Long> sortedAuctions, List<SearchHistory> searchHistoryRecords) {
 
-        System.out.println("In here");
-        System.out.println(sortedUsers);
-        System.out.println(sortedAuctions);
-        System.out.println(searchHistoryRecords);
-
         if (sortedUsers.isEmpty() || sortedAuctions.isEmpty() || searchHistoryRecords.isEmpty())
             return;
 

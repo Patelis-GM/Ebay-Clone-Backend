@@ -57,6 +57,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException) throws IOException, ServletException {
 
         UserException userException;
+
         if (authenticationException instanceof DisabledException)
             userException = new UserException(UserException.USER_NOT_APPROVED, HttpStatus.UNAUTHORIZED);
         else if (authenticationException instanceof BadCredentialsException)

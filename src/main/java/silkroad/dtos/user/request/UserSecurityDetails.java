@@ -10,10 +10,7 @@ import java.io.Serializable;
 public class UserSecurityDetails implements Serializable {
 
     private final String username;
-
     private final String password;
-
     private final Boolean approved;
-
     private final String role;
 }

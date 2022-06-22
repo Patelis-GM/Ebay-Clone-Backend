@@ -13,9 +13,10 @@ public class MatrixUtilities {
                 if (matrix[i][j] > maxElement)
                     maxElement = matrix[i][j];
 
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-                matrix[i][j] /= maxElement;
+        if (maxElement != 0)
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < columns; j++)
+                    matrix[i][j] /= maxElement;
     }
 
     public static double[][] multiplyMatrices(double[][] V, double[][] F, int rows, int columns, int latentFeatures) {
@@ -68,23 +69,5 @@ public class MatrixUtilities {
         return matrix;
     }
 
-    public static String toString(double[][] values, int rows, int columns) {
-
-        StringBuilder stringBuilder = new StringBuilder("\n");
-
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++) {
-                stringBuilder.append(String.format("%4f", values[i][j]));
-                if (j == columns - 1)
-                    stringBuilder.append("\n");
-                else
-                    stringBuilder.append(" ");
-            }
-
-        stringBuilder.append("\n");
-
-        return stringBuilder.toString();
-
-    }
 
 }

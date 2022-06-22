@@ -50,13 +50,11 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
-    /* Build Authentication Manager */
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(this.userService).passwordEncoder(this.bCryptPasswordEncoder);
     }
 
-    /* Retrieve Authentication Manager */
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {

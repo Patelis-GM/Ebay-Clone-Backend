@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface AuctionMapper {
 
-    /* As Browser */
-
     @Mapping(source = "address.country", target = "country")
     @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
     AuctionBrowsingDetails toAuctionBrowsingDetails(Auction auction);
@@ -24,7 +22,6 @@ public interface AuctionMapper {
     List<AuctionBrowsingDetails> toAuctionBrowsingDetailsList(List<Auction> auctions);
 
 
-    /* As Buyer */
     @Mapping(target = "date", source = "latestBid.submissionDate")
     @Mapping(target = "cost", source = "latestBid.amount")
     @Mapping(target = "seller", source = "seller.username")
@@ -34,7 +31,6 @@ public interface AuctionMapper {
     List<AuctionPurchaseDetails> toAuctionPurchaseDetailsList(List<Auction> auctions);
 
 
-    /* As Seller  */
     @Mapping(target = "bidder", source = "latestBid.bidder.username")
     @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
     @Mapping(target = "expired", expression = "java(mapExpired(auction))")
@@ -43,7 +39,6 @@ public interface AuctionMapper {
     List<AuctionBasicDetails> toAuctionBasicDetailsList(List<Auction> auctions);
 
 
-    /* As Everyone */
     @Mapping(target = "sellerRating", source = "seller.sellerRating")
     @Mapping(target = "seller", source = "seller.username")
     @Mapping(target = "images", expression = "java(mapImages(auction.getImages()))")
@@ -56,17 +51,11 @@ public interface AuctionMapper {
 
         final String SLASH = "/";
 
-        long time = System.currentTimeMillis();
-
         List<String> imageList = new ArrayList<>();
         for (Image image : images) {
             String filename = image.getPath().substring(image.getPath().lastIndexOf(SLASH) + 1);
             imageList.add(filename);
         }
-
-
-
-
         return imageList;
     }
 
