@@ -16,9 +16,10 @@ public class RecommendationMatrix {
     private final Logger logger = LoggerFactory.getLogger(RecommendationMatrix.class);
 
     private final double learningRate = 0.001;
-    private final double regularizationPenalty = 0.08;
-    private final int latentFeatures = 2;
+    private final double regularizationPenalty = 0.09;
+    private final int latentFeatures = 3;
     private final int patience = 1;
+    private final int epochs = 300;
 
     public RecommendationMatrix() {
         this.recommendationMatrix = null;
@@ -112,7 +113,7 @@ public class RecommendationMatrix {
         int iterations = 0;
         int outOfPatience = 0;
 
-        while (true){
+        while (iterations != epochs){
 
             iterations++;
 
@@ -120,7 +121,8 @@ public class RecommendationMatrix {
 
             for (int i = 0; i < totalUsers; i++)
                 for (int j = 0; j < totalAuctions; j++)
-                    if (!isInValidationSet(i, j, totalUsers, totalAuctions) && matrix[i][j] > 0.0) {
+                    if (!isInValidationSet(i, j, totalUsers, totalAuctions) && matrix[i][j] != 0.0) {
+
                         double[] predictionRow = MatrixUtilities.getRow(V, i);
                         double[] predictionColumn = MatrixUtilities.getColumn(F, j);
 
@@ -171,7 +173,6 @@ public class RecommendationMatrix {
                         trainRMSE += Math.pow(eij, 2.0);
                         trainSetCardinality += 1.0;
                     }
-
 
                 }
 

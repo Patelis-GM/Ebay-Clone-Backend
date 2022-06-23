@@ -33,7 +33,6 @@ public class CustomBidRepositoryImpl implements CustomBidRepository {
 
         CriteriaQuery<Long> countQuery = getCountQuery(criteriaBuilder, specification);
         Long count = entityManager.createQuery(countQuery).getSingleResult();
-        System.out.println(count);
 
         TypedQuery<Bid> typedQuery = entityManager.createQuery("SELECT DISTINCT b FROM Bid b JOIN FETCH b.auction as auction JOIN FETCH auction.images WHERE b.id in :ids", Bid.class);
         typedQuery.setParameter("ids", ids);
