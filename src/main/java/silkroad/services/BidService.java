@@ -48,8 +48,13 @@ public class BidService {
 
         Optional<Auction> optionalAuction = this.auctionRepository.findBiddableById(auctionID, bidDate, version);
 
-        if (optionalAuction.isEmpty())
-            throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_MODIFIED_OR_EXPIRED, HttpStatus.BAD_REQUEST);
+        if (optionalAuction.isEmpty()) {
+            if (!this.auctionRepository.existsById(auctionID))
+                throw new AuctionException(AuctionException.AUCTION_NOT_FOUND, HttpStatus.NOT_FOUND);
+
+            else
+                throw new AuctionException(auctionID.toString(), AuctionException.AUCTION_MODIFIED_OR_EXPIRED, HttpStatus.BAD_REQUEST);
+        }
 
         Auction auction = optionalAuction.get();
 
