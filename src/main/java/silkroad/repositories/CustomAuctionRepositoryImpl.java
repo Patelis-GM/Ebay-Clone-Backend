@@ -4,7 +4,6 @@ import org.hibernate.jpa.QueryHints;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.lang.Nullable;
@@ -14,11 +13,8 @@ import silkroad.entities.Auction_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Transactional(readOnly = true)
@@ -96,6 +92,7 @@ public class CustomAuctionRepositoryImpl implements CustomAuctionRepository {
         return new PageImpl<>(auctions, pageRequest, count);
     }
 
+    @Override
     public List<Auction> exportAuctions(Specification<Auction> specification, Integer maxResults) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
