@@ -164,6 +164,7 @@ public class AuctionSpecificationBuilder {
 
             auctionPredicates.add(criteriaBuilder.equal(root.get(Auction_.SELLER).get(User_.USERNAME), username));
 
+
             return criteriaBuilder.and(auctionPredicates.toArray(new Predicate[0]));
 
         };

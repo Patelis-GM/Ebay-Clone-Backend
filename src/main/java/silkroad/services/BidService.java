@@ -109,7 +109,7 @@ public class BidService {
 
     public PageResponse<BidBuyerDetails> getUserBids(Authentication authentication, Integer page, Integer size) {
 
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Bid_.SUBMISSION_DATE).descending());
 
         Specification<Bid> bidSpecification = BidSpecificationBuilder.getUserBidsSpecification(authentication.getName());
 
