@@ -45,7 +45,7 @@ public class UserService implements UserDetailsService {
 
         Optional<UserSecurityDetails> user = this.userRepository.findByUsername(username);
 
-        if (user.isEmpty())
+        if (user.isEmpty() || !user.get().getUsername().equals(username))
             throw new UsernameNotFoundException(username);
 
         ArrayList<GrantedAuthority> grantedAuthorities = new ArrayList<>();
@@ -62,8 +62,9 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void signUpUser(UserRegistration user) {
 
-        if (this.userRepository.existsByUsername(user.getUsername()))
+        if (this.userRepository.existsByUsername(user.getUsername().toLowerCase()) > 0)
             throw new UserException(user.getUsername(), UserException.USER_USERNAME_EXISTS, HttpStatus.BAD_REQUEST);
+
 
         if (this.userRepository.existsByEmail(user.getEmail()))
             throw new UserException(user.getEmail(), UserException.USER_EMAIL_EXISTS, HttpStatus.BAD_REQUEST);

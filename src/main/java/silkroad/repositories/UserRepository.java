@@ -21,8 +21,8 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     @Query("SELECT u FROM User u JOIN FETCH u.address WHERE u.username = ?1")
     Optional<User> findWithAddressByUsername(String username);
 
-    @Transactional
-    Boolean existsByUsername(String username);
+    @Query("SELECT COUNT(u.username) FROM User u WHERE lower(u.username) = ?1")
+    Long existsByUsername(String username);
 
     @Transactional
     Boolean existsByEmail(String email);
@@ -32,10 +32,7 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     @Query("UPDATE User u SET u.approved = ?2 WHERE u.username = ?1")
     Integer updateApprovalStatusByUsername(String username, Boolean approvalStatus);
 
-
     @Query("SELECT u.username FROM User u WHERE u.approved = TRUE ORDER BY u.username ASC")
     List<String> findSortedUsernames();
-
-
 
 }

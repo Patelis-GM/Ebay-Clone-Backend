@@ -25,4 +25,5 @@ public interface SearchHistoryRepository extends JpaRepository<SearchHistory, Se
 
     @Query("SELECT s FROM SearchHistory s WHERE s.id.auctionId IN ?1")
     List<SearchHistory> findAllByAuctionId(List<Long> sortedAuctions);
+
 }
