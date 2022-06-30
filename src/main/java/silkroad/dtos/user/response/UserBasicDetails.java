@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 public class UserBasicDetails implements Serializable {
-
+    
     private final String username;
     private final String role;
     private final Boolean approved;

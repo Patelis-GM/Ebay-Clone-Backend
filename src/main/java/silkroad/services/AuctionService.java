@@ -56,11 +56,19 @@ public class AuctionService {
     @Transactional
     public void createAuction(Authentication authentication, AuctionPosting auctionDTO, MultipartFile[] multipartFiles) {
 
-
         Set<Category> auctionCategories = this.categoryRepository.findAllDistinct(auctionDTO.getCategories());
 
         if (auctionCategories.size() != auctionDTO.getCategories().size())
             throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.AUCTION_INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
+
+        if (auctionDTO.getFirstBid() <= 0)
+            throw new AuctionException(AuctionException.AUCTION_INVALID_FIRST_BID, HttpStatus.BAD_REQUEST);
+
+        if (auctionDTO.getBuyPrice() != null && auctionDTO.getBuyPrice() <= 0)
+            throw new AuctionException(AuctionException.AUCTION_INVALID_BUY_PRICE, HttpStatus.BAD_REQUEST);
+
+        if (auctionDTO.getBuyPrice() != null && auctionDTO.getBuyPrice() < auctionDTO.getFirstBid())
+            throw new AuctionException(AuctionException.AUCTION_INVALID_BUY_PRICE_FIRST_BID, HttpStatus.BAD_REQUEST);
 
         String username = authentication.getName();
         User seller = new User(username);
@@ -95,9 +103,17 @@ public class AuctionService {
 
         Set<Category> auctionCategories = this.categoryRepository.findAllDistinct(auctionDTO.getCategories());
 
-
         if (auctionCategories.size() != auctionDTO.getCategories().size())
             throw new AuctionException(auctionDTO.getCategories().toString(), AuctionException.AUCTION_INVALID_CATEGORIES, HttpStatus.BAD_REQUEST);
+
+        if (auctionDTO.getFirstBid() <= 0)
+            throw new AuctionException(AuctionException.AUCTION_INVALID_FIRST_BID, HttpStatus.BAD_REQUEST);
+
+        if (auctionDTO.getBuyPrice() != null && auctionDTO.getBuyPrice() <= 0)
+            throw new AuctionException(AuctionException.AUCTION_INVALID_BUY_PRICE, HttpStatus.BAD_REQUEST);
+
+        if (auctionDTO.getBuyPrice() != null && auctionDTO.getBuyPrice() < auctionDTO.getFirstBid())
+            throw new AuctionException(AuctionException.AUCTION_INVALID_BUY_PRICE_FIRST_BID, HttpStatus.BAD_REQUEST);
 
         auction.setAddress(auctionDTO.getAddress());
         auction.setName(auctionDTO.getName());
