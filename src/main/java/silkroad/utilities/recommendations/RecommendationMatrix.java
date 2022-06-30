@@ -29,11 +29,13 @@ public class RecommendationMatrix {
 
         ArrayList<Long> recommendations = new ArrayList<>();
 
+        /* In case the corresponding User is a guest */
         if (authentication == null)
             return recommendations;
 
         String username = authentication.getName();
 
+        /* In case the corresponding User was not considered during factorization or there are no Auctions available*/
         if (this.recommendationMatrix == null || !this.users.containsKey(username) || this.auctions.isEmpty())
             return recommendations;
 
@@ -112,7 +114,7 @@ public class RecommendationMatrix {
 
             iterations++;
 
-            /* Weight Update */
+            /* Weights Update */
             for (int i = 0; i < totalUsers; i++)
                 for (int j = 0; j < totalAuctions; j++)
                     if (!isInValidationSet(i, j, totalUsers, totalAuctions) && matrix[i][j] != 0.0) {
@@ -135,7 +137,7 @@ public class RecommendationMatrix {
 
                     }
 
-
+            /* Calculate RMSE in Validation - Set */
             double validationRMSE = 0.0;
             double validationSetCardinality = 0.0;
 
