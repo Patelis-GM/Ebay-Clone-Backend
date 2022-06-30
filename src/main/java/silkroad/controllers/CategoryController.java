@@ -18,6 +18,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    /* Get Categories End-Point */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/categories", method = RequestMethod.GET)
     public ResponseEntity<List<String>> getCategories() {

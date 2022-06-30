@@ -18,6 +18,7 @@ public class RecommendationController {
 
     private final RecommendationService recommendationService;
 
+    /* Get User's Recommendations End-Point*/
     @RequestMapping(value = "/recommend", method = RequestMethod.GET)
     public ResponseEntity<List<AuctionBrowsingDetails>> recommend(Authentication authentication) {
         return new ResponseEntity<>(this.recommendationService.recommend(authentication), HttpStatus.OK);

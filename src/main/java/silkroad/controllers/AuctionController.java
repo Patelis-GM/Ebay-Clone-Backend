@@ -26,7 +26,7 @@ public class AuctionController {
     private final AuctionService auctionService;
     private final BidService bidService;
 
-    /* Create Auction */
+    /* Create Auction End-Point */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions", method = RequestMethod.POST)
     public ResponseEntity<Void> createAuction(Authentication authentication, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images", required = false) MultipartFile[] multipartFiles) {
@@ -36,7 +36,7 @@ public class AuctionController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    /* Update Auction */
+    /* Update Auction End-Point */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}", method = RequestMethod.PUT)
     public ResponseEntity<Void> updateAuction(Authentication authentication, @PathVariable Long auctionID, @RequestPart(name = "auction") AuctionPosting auctionDTO, @RequestPart(name = "images", required = false) MultipartFile[] multipartFiles) {
@@ -46,7 +46,7 @@ public class AuctionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /* Delete Auction */
+    /* Delete Auction End-Point */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteAuction(Authentication authentication, @PathVariable Long auctionID) {
@@ -54,7 +54,7 @@ public class AuctionController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /* Get Auction */
+    /* Get specific Auction End-Point */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}", method = RequestMethod.GET)
     public ResponseEntity<AuctionCompleteDetails> getAuction(Authentication authentication, @PathVariable Long auctionID) {
@@ -62,7 +62,7 @@ public class AuctionController {
     }
 
 
-    /* Browse Auctions */
+    /* Browse Auctions End-Point */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<AuctionBrowsingDetails>> browseAuctions(@RequestParam(name = "query", required = false) String textSearch,
@@ -78,7 +78,7 @@ public class AuctionController {
     }
 
 
-    /* Bid on Auction */
+    /* Bid on Auction End-Point */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}/bid", method = RequestMethod.POST)
     public ResponseEntity<Void> bid(Authentication authentication, @PathVariable Long auctionID, @RequestBody BidPosting bidPosting) {
@@ -86,7 +86,7 @@ public class AuctionController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    /* Get Auction Bids */
+    /* Get Auction's Bids End-Point */
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/auctions/{auctionID}/bid", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<BidSellerDetails>> getAuctionBids(Authentication authentication,

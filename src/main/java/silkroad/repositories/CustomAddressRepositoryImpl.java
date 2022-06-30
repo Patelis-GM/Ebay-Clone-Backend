@@ -12,6 +12,7 @@ public class CustomAddressRepositoryImpl implements CustomAddressRepository {
     @PersistenceContext
     EntityManager entityManager;
 
+
     @Override
     @Transactional
     public Address persist(Address address) throws PersistenceException {

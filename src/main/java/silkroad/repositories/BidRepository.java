@@ -1,18 +1,12 @@
 package silkroad.repositories;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
-import silkroad.entities.Auction;
 import silkroad.entities.Bid;
-import silkroad.entities.User;
-
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 public interface BidRepository extends JpaRepository<Bid, Long>, CustomBidRepository {
@@ -29,5 +23,4 @@ public interface BidRepository extends JpaRepository<Bid, Long>, CustomBidReposi
     @Query(value = "SELECT b FROM Bid b JOIN FETCH b.bidder WHERE b.auction.id = ?1",
             countQuery = "SELECT COUNT(b) FROM Bid b WHERE b.auction.id = ?1")
     Page<Bid> findByAuctionId(Long auctionID, Pageable pageable);
-
 }

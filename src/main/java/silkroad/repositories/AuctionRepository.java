@@ -15,11 +15,25 @@ import java.util.Optional;
 @Repository
 public interface AuctionRepository extends JpaRepository<Auction, Long>, CustomAuctionRepository {
 
+
+    /* The following query uses LockModeType.PESSIMISTIC_WRITE to avoid the following scenarios :
+     *  (1) Bidder - Y bids on Auction - X
+     *  (2) Owner - Z of X attempts to update / delete X
+     *  (1) - (2) happen at the exact same time
+     *
+     *  (3) User - 1 bids on Auction - W
+     *  (4) User - 2 bids on Auction - W
+     *  (1) - (2) happen at the exact same time */
     @Transactional
     @Query("SELECT a FROM Auction a WHERE a.id = ?1 AND ?2 < a.endDate AND a.version = ?3 AND ((a.buyPrice is NULL) OR (a.buyPrice IS NOT NULL AND a.highestBid < a.buyPrice))")
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Auction> findBiddableById(Long auctionID, Date now, Long version);
 
+
+    /* The following query uses LockModeType.PESSIMISTIC_WRITE to avoid the following scenario :
+    *  (1) Bidder - Y bids on Auction - X
+    *  (2) Owner - Z of X attempts to update / delete X
+    *  (1) - (2) happen at the exact same time */
     @Transactional
     @Query("SELECT a FROM Auction a WHERE a.id = ?1 AND a.latestBid is NULL AND a.endDate > ?2")
     @Lock(LockModeType.PESSIMISTIC_WRITE)

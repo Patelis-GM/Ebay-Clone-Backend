@@ -14,6 +14,7 @@ public class MediaController {
 
     private final ImageService imageService;
 
+    /* Get specific Image End-Point */
     @RequestMapping(value = "/media/{auctionID}/{fileName}", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE}, method = RequestMethod.GET)
     public ResponseEntity<byte[]> getFile(@PathVariable Long auctionID, @PathVariable String fileName) {
         return new ResponseEntity<>(this.imageService.getImage(auctionID, fileName), HttpStatus.OK);
