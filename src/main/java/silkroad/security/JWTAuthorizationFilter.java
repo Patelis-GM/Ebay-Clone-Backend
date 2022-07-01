@@ -32,6 +32,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         boolean isBearerOfJWT = JWTUtilities.isBearerOfJWT(request);
 
+        /* In case a User attempts to log in while bearing a valid JWT */
         if (request.getServletPath().equals("/login")) {
 
             if (!isBearerOfJWT)
