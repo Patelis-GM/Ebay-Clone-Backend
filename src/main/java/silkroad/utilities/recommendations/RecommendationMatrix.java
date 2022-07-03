@@ -35,13 +35,12 @@ public class RecommendationMatrix {
 
         String username = authentication.getName();
 
-        /* In case the corresponding User was not considered during factorization or there are no Auctions available*/
+        /* In case the corresponding User was not considered during Factorization or there are no Auctions available */
         if (this.recommendationMatrix == null || !this.users.containsKey(username) || this.auctions.isEmpty())
             return recommendations;
 
         int userIndex = this.users.get(username);
         double[] userRecommendations = MatrixUtilities.getRow(this.recommendationMatrix, userIndex);
-
 
         long[] auctionIDS = new long[userRecommendations.length];
         for (Long auctionID : this.auctions.keySet())
@@ -76,7 +75,10 @@ public class RecommendationMatrix {
         int totalUsers = sortedUsers.size();
         int totalAuctions = sortedAuctions.size();
 
-
+        /* Create the following HashMap :
+        *  # User - X <-> Index : 0
+        *  # User - Y <-> Index : 1
+        *  # Etc. */
         int userIndex = 0;
         HashMap<String, Integer> userMap = new HashMap<>();
         for (String user : sortedUsers) {
@@ -84,6 +86,10 @@ public class RecommendationMatrix {
             userIndex += 1;
         }
 
+        /* Create the following HashMap :
+         *  # Auction - X <-> Index : 0
+         *  # Auction - Y <-> Index : 1
+         *  # Etc. */
         int auctionIndex = 0;
         HashMap<Long, Integer> auctionMap = new HashMap<>();
         for (Long auction : sortedAuctions) {
@@ -91,7 +97,7 @@ public class RecommendationMatrix {
             auctionIndex += 1;
         }
 
-
+        /* Create the User - Auction interactions Matrix and fill it with the appropriate values */
         double[][] matrix = new double[totalUsers][totalAuctions];
         for (SearchHistory record : searchHistoryRecords) {
             String username = record.getId().getUserId();
@@ -114,7 +120,9 @@ public class RecommendationMatrix {
 
             iterations++;
 
-            /* Weights Update */
+            /* Weights Update
+             * The Validation set of a Matrix is the upper - left quarter of it while the rest of it
+             * serves as the Training - Set */
             for (int i = 0; i < totalUsers; i++)
                 for (int j = 0; j < totalAuctions; j++)
                     if (!isInValidationSet(i, j, totalUsers, totalAuctions) && matrix[i][j] != 0.0) {
@@ -143,7 +151,7 @@ public class RecommendationMatrix {
 
             for (int i = 0; i < totalUsers; i++)
                 for (int j = 0; j < totalAuctions; j++){
-                    if (isInValidationSet(i, j, totalUsers, totalAuctions) && matrix[i][j] > 0.0) {
+                    if (isInValidationSet(i, j, totalUsers, totalAuctions) && matrix[i][j] != 0.0) {
 
                         double[] predictionRow = MatrixUtilities.getRow(V, i);
                         double[] predictionColumn = MatrixUtilities.getColumn(F, j);
@@ -183,6 +191,7 @@ public class RecommendationMatrix {
 
     }
 
+    /* The Validation set of a Matrix is the upper - left quarter of it */
     private static boolean isInValidationSet(int i, int j, int rows, int columns) {
         return (i < (rows / 2) && j < (columns / 2));
     }

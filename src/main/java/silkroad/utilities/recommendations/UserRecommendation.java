@@ -2,9 +2,11 @@ package silkroad.utilities.recommendations;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
+@ToString
 public class UserRecommendation implements Comparable<UserRecommendation> {
 
     private Long auctionID;
