@@ -1,5 +1,5 @@
 # eBay Clone Backend
-This project is a backend implementation of an eBay clone developed as part of the course "Web Application Technologies" at the Department of Informatics and Telecommunications of the National and Kapodistrian University of Athens. It follows the Controller Service Repository pattern, providing a structured and modular approach to building a robust web application's backend.
+This project is a backend implementation of an eBay clone. It follows the Controller Service Repository pattern, providing a structured and modular approach to building a robust web application's backend.
 
 The API's endpoints can be found [here](https://github.com/Patelis-GM/Ebay-Clone-Backend/tree/master/src/main/java/silkroad/controllers).
 
